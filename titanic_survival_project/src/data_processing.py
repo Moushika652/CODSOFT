@@ -1,3 +1,4 @@
+
 import os
 import re
 import numpy as np
@@ -9,94 +10,123 @@ def _project_root():
 
 
 def load_data(path: str = None) -> pd.DataFrame:
-    """Load dataset. By default loads the workspace CSV file in the repo root."""
+    """Load Titanic dataset (cleaned but same shape)."""
     if path is None:
         path = os.path.join(_project_root(), 'titanic_cleaned_same_shape.csv')
+    """Load dataset. If `path` is None, search for `titanic_cleaned_same_shape.csv` in
+    sensible locations (cwd and parent folders) and return the loaded DataFrame.
+    """
+    filename = 'titanic_cleaned_same_shape.csv'
+
+    def _search_candidates():
+        # 1. explicit cwd
+        yield os.path.join(os.getcwd(), filename)
+        # 2. relative to this file (src/ -> repo root)
+        yield os.path.join(_project_root(), filename)
+        # 3. walk upward from cwd
+        cur = os.path.abspath(os.getcwd())
+        while True:
+            yield os.path.join(cur, filename)
+            parent = os.path.dirname(cur)
+            if parent == cur:
+                break
+            cur = parent
+
+    if path is None:
+        found = None
+        for candidate in _search_candidates():
+            if os.path.exists(candidate):
+                found = candidate
+                break
+        if found is None:
+            raise FileNotFoundError(
+                f"Could not find '{filename}'. Please place it at the repository root or pass its path to load_data(path=...)."
+            )
+        path = found
+
     return pd.read_csv(path)
 
 
 def parse_honorific(name: str) -> str:
-    """Extract an honorific with a tolerant regex and normalized mapping.
-
-    This function uses a permissive regex, then maps uncommon forms to 'Other'.
-    """
+    """Extract honorific from passenger name and normalize rare titles."""
     if pd.isna(name):
         return 'Unknown'
-    m = re.search(r",\s*([^\.\,]+)\.?\s*", name)
-    if m:
-        t = m.group(1).strip()
-        # normalize some common variants
+
+    match = re.search(r",\s*([A-Za-z]+)\.?", name)
+    if match:
+        title = match.group(1)
         mapping = {
-            'Mlle': 'Miss', 'Ms': 'Miss', 'Mme': 'Mrs', 'Lady': 'Lady', 'Countess': 'Other'
+            'Mlle': 'Miss',
+            'Ms': 'Miss',
+            'Mme': 'Mrs'
         }
-        return mapping.get(t, t)
-    # final fallback
+        return mapping.get(title, title)
+
     return 'Other'
 
 
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    # Honorifics
+    # Honorific extraction
     df['HonorificCode'] = df['Name'].apply(parse_honorific)
 
-    # Family features: family size and a novel "family cohesion" score
-    df['FamilySize'] = df.get('SibSp', 0) + df.get('Parch', 0) + 1
-    # cohort age variability per shared ticket — smaller variance suggests closer family grouping
-    age_std_by_ticket = df.groupby('Ticket')['Age'].transform('std').fillna(0)
-    # FamilyCohesion: larger family and low within-ticket age std increases cohesion
-    df['FamilyCohesion'] = df['FamilySize'] * np.exp(-0.1 * age_std_by_ticket)
-
-    # Single-traveler flag
+    # Family-based features
+    df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
     df['IsAlone'] = (df['FamilySize'] == 1).astype(int)
 
-    # Cabin presence flag (named nontrivially)
-    df['CabinFlag'] = (~df.get('Cabin', pd.Series([np.nan]*len(df))).isna()).astype(int)
+    # Ticket-based age variability (cohesion signal)
+    age_std_by_ticket = df.groupby('Ticket')['Age'].transform('std').fillna(0)
+    df['FamilyCohesion'] = df['FamilySize'] * np.exp(-0.1 * age_std_by_ticket)
+
+    # Cabin availability flag
+    df['CabinFlag'] = df['Cabin'].notna().astype(int)
 
     # Shared ticket count
     df['SharedTicketCount'] = df.groupby('Ticket')['Ticket'].transform('count')
 
-    # Normalized fare per apparent family
+    # Normalized fare
     df['NormalizedFare'] = df['Fare'] / df['FamilySize']
     df['NormalizedFare'] = df['NormalizedFare'].replace([np.inf, -np.inf], np.nan)
+    df['NormalizedFare'] = df['NormalizedFare'].fillna(df['NormalizedFare'].median())
 
-    # Impute Age sensibly: median per Title, fallback to global median
-    age_medians = df.groupby('HonorificCode')['Age'].median()
-    global_median = df['Age'].median()
-
-    def impute_age(row):
-        if pd.isna(row['Age']):
-            t = row['HonorificCode']
-            if not pd.isna(age_medians.get(t, np.nan)):
-                return age_medians[t]
-            return global_median
-        return row['Age']
-
-    df['Age'] = df.apply(impute_age, axis=1)
-
-    # Reduce Honorific codes to a short set
+    # Reduce honorifics to stable categories
     common_titles = ['Mr', 'Mrs', 'Miss', 'Master', 'Dr']
-    df['HonorificCode'] = df['HonorificCode'].apply(lambda t: t if t in common_titles else 'Other')
+    df['HonorificCode'] = df['HonorificCode'].apply(
+        lambda t: t if t in common_titles else 'Other'
+    )
 
-    # Final tidy: select useful columns (keep original columns too)
-    # leave downstream code to pick features; return enriched dataframe
     return df
 
 
 def prepare_X_y(df: pd.DataFrame):
     df = engineer_features(df)
-    # Label
+
     if 'Survived' not in df.columns:
-        raise KeyError('Dataset must contain Survived column')
+        raise KeyError("Target column 'Survived' not found")
+
     y = df['Survived'].astype(int)
 
-    # Candidate features (engineered names intentionally distinct)
-    X = df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'HonorificCode', 'FamilySize', 'FamilyCohesion', 'IsAlone', 'CabinFlag', 'SharedTicketCount', 'NormalizedFare']].copy()
+    X = df[
+        [
+            'Pclass',
+            'Sex',
+            'Age',
+            'Fare',
+            'Embarked',
+            'HonorificCode',
+            'FamilySize',
+            'FamilyCohesion',
+            'IsAlone',
+            'CabinFlag',
+            'SharedTicketCount',
+            'NormalizedFare'
+        ]
+    ].copy()
 
-    # Some basic cleaning
+    # Final safety fills
     X['Embarked'] = X['Embarked'].fillna('Unknown')
     X['Fare'] = X['Fare'].fillna(X['Fare'].median())
-    X['NormalizedFare'] = X['NormalizedFare'].fillna(X['NormalizedFare'].median())
 
     return X, y
 
@@ -104,111 +134,6 @@ def prepare_X_y(df: pd.DataFrame):
 if __name__ == '__main__':
     df = load_data()
     X, y = prepare_X_y(df)
-    print('Loaded data with', len(X), 'rows; features:', list(X.columns))
-import os
-import re
-import numpy as np
-import pandas as pd
-
-
-def _project_root():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-
-
-def load_data(path: str = None) -> pd.DataFrame:
-    """Load dataset. By default loads the workspace CSV file in the repo root."""
-    if path is None:
-        path = os.path.join(_project_root(), 'titanic_cleaned_same_shape.csv')
-    return pd.read_csv(path)
-
-
-def parse_honorific(name: str) -> str:
-    """Extract an honorific with a tolerant regex and normalized mapping.
-
-    This function uses a permissive regex, then maps uncommon forms to 'Other'.
-    """
-    if pd.isna(name):
-        return 'Unknown'
-    m = re.search(r",\s*([^\.\,]+)\.?\s*", name)
-    if m:
-        t = m.group(1).strip()
-        # normalize some common variants
-        mapping = {
-            'Mlle': 'Miss', 'Ms': 'Miss', 'Mme': 'Mrs', 'Lady': 'Lady', 'Countess': 'Other'
-        }
-        return mapping.get(t, t)
-    # final fallback
-    return 'Other'
-
-
-def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-
-    # Honorifics
-    df['HonorificCode'] = df['Name'].apply(parse_honorific)
-
-    # Family features: family size and a novel "family cohesion" score
-    df['FamilySize'] = df.get('SibSp', 0) + df.get('Parch', 0) + 1
-    # cohort age variability per shared ticket — smaller variance suggests closer family grouping
-    age_std_by_ticket = df.groupby('Ticket')['Age'].transform('std').fillna(0)
-    # FamilyCohesion: larger family and low within-ticket age std increases cohesion
-    df['FamilyCohesion'] = df['FamilySize'] * np.exp(-0.1 * age_std_by_ticket)
-
-    # Single-traveler flag
-    df['IsAlone'] = (df['FamilySize'] == 1).astype(int)
-
-    # Cabin presence flag (named nontrivially)
-    df['CabinFlag'] = (~df.get('Cabin', pd.Series([np.nan]*len(df))).isna()).astype(int)
-
-    # Shared ticket count
-    df['SharedTicketCount'] = df.groupby('Ticket')['Ticket'].transform('count')
-
-    # Normalized fare per apparent family
-    df['NormalizedFare'] = df['Fare'] / df['FamilySize']
-    df['NormalizedFare'] = df['NormalizedFare'].replace([np.inf, -np.inf], np.nan)
-
-    # Impute Age sensibly: median per Title, fallback to global median
-    age_medians = df.groupby('HonorificCode')['Age'].median()
-    global_median = df['Age'].median()
-
-    def impute_age(row):
-        if pd.isna(row['Age']):
-            t = row['HonorificCode']
-            if not pd.isna(age_medians.get(t, np.nan)):
-                return age_medians[t]
-            return global_median
-        return row['Age']
-
-    df['Age'] = df.apply(impute_age, axis=1)
-
-    # Reduce Honorific codes to a short set
-    common_titles = ['Mr', 'Mrs', 'Miss', 'Master', 'Dr']
-    df['HonorificCode'] = df['HonorificCode'].apply(lambda t: t if t in common_titles else 'Other')
-
-    # Final tidy: select useful columns (keep original columns too)
-    # leave downstream code to pick features; return enriched dataframe
-    return df
-
-
-def prepare_X_y(df: pd.DataFrame):
-    df = engineer_features(df)
-    # Label
-    if 'Survived' not in df.columns:
-        raise KeyError('Dataset must contain Survived column')
-    y = df['Survived'].astype(int)
-
-    # Candidate features (engineered names intentionally distinct)
-    X = df[['Pclass', 'Sex', 'Age', 'Fare', 'Embarked', 'HonorificCode', 'FamilySize', 'FamilyCohesion', 'IsAlone', 'CabinFlag', 'SharedTicketCount', 'NormalizedFare']].copy()
-
-    # Some basic cleaning
-    X['Embarked'] = X['Embarked'].fillna('Unknown')
-    X['Fare'] = X['Fare'].fillna(X['Fare'].median())
-    X['NormalizedFare'] = X['NormalizedFare'].fillna(X['NormalizedFare'].median())
-
-    return X, y
-
-
-if __name__ == '__main__':
-    df = load_data()
-    X, y = prepare_X_y(df)
-    print('Loaded data with', len(X), 'rows; features:', list(X.columns))
+    print(f"Dataset loaded successfully: {len(X)} rows")
+    print("Feature columns:")
+    print(list(X.columns))

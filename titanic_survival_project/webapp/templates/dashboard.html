@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Predictions Dashboard</title>
+    <style>table {border-collapse: collapse;} td, th {border: 1px solid #ccc;padding:6px;}</style>
+  </head>
+  <body>
+    <h2>Predictions Dashboard</h2>
+    <p><a href="/logout">Logout</a> | <a href="/download">Download CSV</a></p>
+    {% if message %}
+      <p>{{ message }}</p>
+    {% else %}
+      <table>
+        <thead>
+          <tr>
+            {% for k in rows[0].keys() %}
+              <th>{{ k }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              {% for v in r.values() %}
+                <td>{{ v }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </body>
+</html>

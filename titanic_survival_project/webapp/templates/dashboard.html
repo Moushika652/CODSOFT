@@ -3,89 +3,67 @@
   <head>
     <meta charset="utf-8">
     <title>Predictions Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
     <style>
-      body { font-family: Arial, Helvetica, sans-serif; margin: 20px; color: #222;
+      body { font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif; margin: 20px; color: #222; font-size:16px;
              background: linear-gradient(135deg, #f6d365 0%, #fda085 50%, #fbc2eb 100%); }
-      .card { background: rgba(255,255,255,0.95); padding: 18px; border-radius: 10px;
+      .card { background: rgba(255,255,255,0.95); padding: 22px; border-radius: 10px;
               box-shadow: 0 6px 18px rgba(0,0,0,0.08); max-width: 1200px; margin: auto; }
-      h2 { margin-top: 0; }
-      table { border-collapse: collapse; width: 100%; }
-      th { background: linear-gradient(90deg,#4b79a1,#283e51); color: #fff; padding: 8px; text-align: left; }
-      td { border: 1px solid rgba(0,0,0,0.06); padding: 6px; }
+      h2 { margin-top: 0; font-family: 'Roboto Slab', serif; font-size:28px; }
+      h3 { font-size:20px; margin-bottom:8px }
+      table { border-collapse: collapse; width: 100%; font-size:14px }
+      th { background: linear-gradient(90deg,#4b79a1,#283e51); color: #fff; padding: 10px; text-align: left; }
+      td { border: 1px solid rgba(0,0,0,0.06); padding: 8px; }
       tbody tr:nth-child(odd) td { background: rgba(255,255,255,0.9); }
       tbody tr:nth-child(even) td { background: rgba(245,248,252,0.9); }
       a { color: #0b63a3; text-decoration: none; }
       a:hover { text-decoration: underline; }
-      .meta { font-size: 0.95rem; color: #333; margin-bottom: 8px; }
+      .meta { font-size: 0.98rem; color: #333; margin-bottom: 8px; }
     </style>
   </head>
   <body>
     <div class="card">
       <h2>Predictions Dashboard</h2>
       <p class="meta"><strong>Dataset:</strong> Titanic passenger data (892 rows). Features include `Pclass`, `Sex`, `Age`, `SibSp`, `Parch`, `Fare`, `Cabin`, `Embarked` and the target `Survived` (1 = survived, 0 = did not). Source: Kaggle "Titanic - Machine Learning from Disaster". This app displays model predictions for demonstration.</p>
+      <p class="meta"><strong>About these results:</strong> This dashboard shows model predictions for each passenger and groups them into "Survived" and "Not survived" according to the model's output (uses `PredictedProb` when available; default threshold is 0.9). Use the buttons to view full records for each group. "Survived" counts indicate how many passengers the model predicts would survive; percentages show the relative share of the dataset. High predicted probability suggests model confidence, but treat these results as illustrative rather than definitive.
+      </p>
       <p class="meta"><strong>Counts:</strong> Survived: {{ survived_count }} &nbsp; | &nbsp; Not survived: {{ not_survived_count }}</p>
+      <p class="meta"><strong>Percentages:</strong> Survived: {{ survived_percent }}% &nbsp; | &nbsp; Not survived: {{ not_survived_percent }}% &nbsp; | &nbsp; Total: {{ total_count }}</p>
       <p><a href="/logout">Logout</a> | <a href="/download">Download CSV</a></p>
       {% if message %}
       <p>{{ message }}</p>
       {% else %}
-      <div style="display:flex; gap:18px; flex-wrap:wrap;">
-        <div style="flex:1 1 480px;">
-          <h3 style="margin-bottom:6px;">Survived ({{ survived_count }})</h3>
-          <div style="overflow:auto; max-height:600px;">
-            <table>
-              <thead>
-                <tr>
-                  {% if rows_survived and rows_survived[0] %}
-                    {% for k in rows_survived[0].keys() %}
-                      <th>{{ k }}</th>
-                    {% endfor %}
-                  {% else %}
-                    <th>No columns</th>
-                  {% endif %}
-                </tr>
-              </thead>
-              <tbody>
-                {% for r in rows_survived %}
-                  <tr>
-                    {% for v in r.values() %}
-                      <td>{{ v }}</td>
-                    {% endfor %}
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+      <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start;">
+        <div style="flex:0 0 360px; background:rgba(255,255,255,0.95); padding:12px; border-radius:8px;">
+          <h3 style="margin:0 0 8px 0;">Survival Summary</h3>
+          <canvas id="survivalChart" width="300" height="300"></canvas>
+          <p style="margin:8px 0 0 0; font-size:0.95rem;">Survived: <strong>{{ survived_count }}</strong> ({{ survived_percent }}%)<br/>Not survived: <strong>{{ not_survived_count }}</strong> ({{ not_survived_percent }}%)</p>
         </div>
 
-        <div style="flex:1 1 480px;">
-          <h3 style="margin-bottom:6px;">Not survived ({{ not_survived_count }})</h3>
-          <div style="overflow:auto; max-height:600px;">
-            <table>
-              <thead>
-                <tr>
-                  {% if rows_not_survived and rows_not_survived[0] %}
-                    {% for k in rows_not_survived[0].keys() %}
-                      <th>{{ k }}</th>
-                    {% endfor %}
-                  {% else %}
-                    <th>No columns</th>
-                  {% endif %}
-                </tr>
-              </thead>
-              <tbody>
-                {% for r in rows_not_survived %}
-                  <tr>
-                    {% for v in r.values() %}
-                      <td>{{ v }}</td>
-                    {% endfor %}
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+        <div style="flex:1 1 480px; display:flex; gap:18px; flex-direction:column;">
+          <div style="display:flex; gap:12px;">
+            <a href="/survived" style="flex:1; padding:14px; background:#2ecc71; color:white; text-align:center; border-radius:10px; text-decoration:none; font-weight:700;">View Survived ({{ survived_count }})</a>
+            <a href="/not_survived" style="flex:1; padding:14px; background:#e74c3c; color:white; text-align:center; border-radius:10px; text-decoration:none; font-weight:700;">View Not survived ({{ not_survived_count }})</a>
           </div>
+          <p style="margin:6px 0 0 0; color:#333;">Click a button to view the full dataset for each group on a separate page.</p>
         </div>
       </div>
     {% endif %}
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      (function() {
+        const ctx = document.getElementById('survivalChart');
+        if (!ctx) return;
+        const data = {
+          labels: ['Survived', 'Not survived'],
+          datasets: [{
+            data: [{{ survived_count }}, {{ not_survived_count }}],
+            backgroundColor: ['#2ecc71', '#e74c3c']
+          }]
+        };
+        new Chart(ctx, { type: 'pie', data: data, options: { responsive: true } });
+      })();
+    </script>
   </body>
 </html>

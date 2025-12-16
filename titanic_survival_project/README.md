@@ -31,3 +31,6 @@ Files of interest
 
 Next steps
 - Optionally split into train/test sets, tune hyperparameters, or add stacking ensembles.
+
+Dataset
+- This project uses the Titanic passenger dataset (892 rows). It contains features such as `Pclass`, `Sex`, `Age`, `SibSp`, `Parch`, `Fare`, `Cabin`, `Embarked` and the binary target `Survived` (1 = survived, 0 = did not). The dataset is the public "Titanic - Machine Learning from Disaster" dataset (Kaggle). The app displays model predictions for demonstration and evaluation.

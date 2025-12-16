@@ -16,7 +16,7 @@ def load_predictions():
     path = os.path.abspath(PREDICTIONS_CSV)
     if not os.path.exists(path):
         return pd.DataFrame()
-    return pd.read_csv(path)
+    return pd.read_csv(path) #type:ignore
 
 
 @app.route('/')
@@ -49,12 +49,45 @@ def logout():
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
+    rows = [] #type:ignore
     df = load_predictions()
     if df.empty:
         return render_template('dashboard.html', rows=[], message='No predictions file found')
-    # show first 200 rows to keep page small
-    rows = df.head(200).to_dict(orient='records')
-    return render_template('dashboard.html', rows=rows, message=None)
+    # show all rows (useful when full dataset needed)
+    # Determine survival groups.
+    # Prefer a probability column `PredictedProb` (use threshold, default 0.9),
+    # then fall back to `Predicted` label or `Survived` column if present.
+    if 'PredictedProb' in df.columns:
+        try:
+            threshold = float(os.environ.get('SURVIVAL_PROB_THRESHOLD', 0.9))
+        except Exception:
+            threshold = 0.9
+        df_survived = df[pd.to_numeric(df['PredictedProb'], errors='coerce') >= threshold] #type:ignore
+        df_not_survived = df[pd.to_numeric(df['PredictedProb'], errors='coerce') < threshold] #type:ignore
+    elif 'Predicted' in df.columns:
+        df_survived = df[df['Predicted'] == 1]
+        df_not_survived = df[df['Predicted'] == 0]
+    elif 'Survived' in df.columns:
+        df_survived = df[df['Survived'] == 1]
+        df_not_survived = df[df['Survived'] == 0]
+    else:
+        # fallback: no prediction column, treat all as not survived
+        df_survived = df.iloc[0:0]
+        df_not_survived = df
+
+    rows_survived = df_survived.to_dict(orient='records')#type:ignore
+    rows_not_survived = df_not_survived.to_dict(orient='records') # type: ignore
+    survived_count = len(rows_survived)
+    not_survived_count = len(rows_not_survived)
+
+    return render_template(
+        'dashboard.html',
+        rows_survived=rows_survived,
+        rows_not_survived=rows_not_survived,
+        survived_count=survived_count,
+        not_survived_count=not_survived_count,
+        message=None,
+    )
 
 
 @app.route('/download')

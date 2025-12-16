@@ -3,32 +3,89 @@
   <head>
     <meta charset="utf-8">
     <title>Predictions Dashboard</title>
-    <style>table {border-collapse: collapse;} td, th {border: 1px solid #ccc;padding:6px;}</style>
+    <style>
+      body { font-family: Arial, Helvetica, sans-serif; margin: 20px; color: #222;
+             background: linear-gradient(135deg, #f6d365 0%, #fda085 50%, #fbc2eb 100%); }
+      .card { background: rgba(255,255,255,0.95); padding: 18px; border-radius: 10px;
+              box-shadow: 0 6px 18px rgba(0,0,0,0.08); max-width: 1200px; margin: auto; }
+      h2 { margin-top: 0; }
+      table { border-collapse: collapse; width: 100%; }
+      th { background: linear-gradient(90deg,#4b79a1,#283e51); color: #fff; padding: 8px; text-align: left; }
+      td { border: 1px solid rgba(0,0,0,0.06); padding: 6px; }
+      tbody tr:nth-child(odd) td { background: rgba(255,255,255,0.9); }
+      tbody tr:nth-child(even) td { background: rgba(245,248,252,0.9); }
+      a { color: #0b63a3; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .meta { font-size: 0.95rem; color: #333; margin-bottom: 8px; }
+    </style>
   </head>
   <body>
-    <h2>Predictions Dashboard</h2>
-    <p><a href="/logout">Logout</a> | <a href="/download">Download CSV</a></p>
-    {% if message %}
+    <div class="card">
+      <h2>Predictions Dashboard</h2>
+      <p class="meta"><strong>Dataset:</strong> Titanic passenger data (892 rows). Features include `Pclass`, `Sex`, `Age`, `SibSp`, `Parch`, `Fare`, `Cabin`, `Embarked` and the target `Survived` (1 = survived, 0 = did not). Source: Kaggle "Titanic - Machine Learning from Disaster". This app displays model predictions for demonstration.</p>
+      <p class="meta"><strong>Counts:</strong> Survived: {{ survived_count }} &nbsp; | &nbsp; Not survived: {{ not_survived_count }}</p>
+      <p><a href="/logout">Logout</a> | <a href="/download">Download CSV</a></p>
+      {% if message %}
       <p>{{ message }}</p>
-    {% else %}
-      <table>
-        <thead>
-          <tr>
-            {% for k in rows[0].keys() %}
-              <th>{{ k }}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in rows %}
-            <tr>
-              {% for v in r.values() %}
-                <td>{{ v }}</td>
-              {% endfor %}
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      {% else %}
+      <div style="display:flex; gap:18px; flex-wrap:wrap;">
+        <div style="flex:1 1 480px;">
+          <h3 style="margin-bottom:6px;">Survived ({{ survived_count }})</h3>
+          <div style="overflow:auto; max-height:600px;">
+            <table>
+              <thead>
+                <tr>
+                  {% if rows_survived and rows_survived[0] %}
+                    {% for k in rows_survived[0].keys() %}
+                      <th>{{ k }}</th>
+                    {% endfor %}
+                  {% else %}
+                    <th>No columns</th>
+                  {% endif %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in rows_survived %}
+                  <tr>
+                    {% for v in r.values() %}
+                      <td>{{ v }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="flex:1 1 480px;">
+          <h3 style="margin-bottom:6px;">Not survived ({{ not_survived_count }})</h3>
+          <div style="overflow:auto; max-height:600px;">
+            <table>
+              <thead>
+                <tr>
+                  {% if rows_not_survived and rows_not_survived[0] %}
+                    {% for k in rows_not_survived[0].keys() %}
+                      <th>{{ k }}</th>
+                    {% endfor %}
+                  {% else %}
+                    <th>No columns</th>
+                  {% endif %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in rows_not_survived %}
+                  <tr>
+                    {% for v in r.values() %}
+                      <td>{{ v }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     {% endif %}
+    </div>
   </body>
 </html>

@@ -3,10 +3,57 @@
   <head>
     <meta charset="utf-8">
     <title>Predictions Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto+Slab:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* override fonts and sizing to Times New Roman */
+        body { font-family: "Times New Roman", Times, serif; font-size: 18px; }
+        .page-title { font-size: 2.4rem; }
+        h2 { font-family: "Times New Roman", Times, serif; font-size: 1.6rem; }
+
+        /* dashboard grid: ensure left alignment so chart sits on left */
+        .dashboard-grid {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        /* left column (chart) alignment and sizing */
+        .dashboard-grid .panel.summary {
+            flex: 0 0 360px;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        #survivalChart {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 360px;
+            margin: 0;
+            align-self: flex-start;
+        }
+
+        /* increase meta and control font sizes */
+        .meta, .btn, .nav-links, .brand { font-size: 1.05rem; font-family: "Times New Roman", Times, serif; }
+
+        @media (max-width: 640px) {
+            .dashboard-grid { flex-direction: column; }
+            #survivalChart { max-width: 100%; }
+        }
+    </style>
   </head>
   <body class="wrap" style="background:var(--bg-2);">
+    <header class="page-header">
+        <h1 class="page-title">{{ page_title or "Titanic Lifeboat Prediction" }}</h1>
+        {% if page_description %}
+            <p class="page-description" style="margin:0.25rem 0 0; font-size:0.95rem;">{{ page_description }}</p>
+        {% endif %}
+    </header>
+
     <div class="card" role="main">
       <header class="site-header">
         <div class="brand">Titanic Predictions</div>
@@ -46,7 +93,6 @@
         <div class="panel summary">
           <h3 style="margin:0 0 8px 0;">Survival Summary</h3>
           <canvas id="survivalChart" width="300" height="300"></canvas>
-          <p class="meta">Survived: <strong>{{ survived_count }}</strong> ({{ survived_percent }}%)<br/>Not survived: <strong>{{ not_survived_count }}</strong> ({{ not_survived_percent }}%)</p>
           <div style="margin-top:12px;">
             <!-- 'By group' table removed per request -->
             {% if inferred_sex_count and inferred_sex_count > 0 %}
@@ -60,13 +106,16 @@
             <a href="/survived" class="btn btn-success" style="flex:1; min-width:180px">View Survived ({{ survived_count }})</a>
             <a href="/not_survived" class="btn btn-danger" style="flex:1; min-width:180px">View Not survived ({{ not_survived_count }})</a>
             {% if sex_col or age_col %}
-                {# removed male/female buttons per request #}
-              {% if age_col %}
-                <a href="/survived?sex=child" class="btn" style="background:#f59e0b;">Survived — Child ({{ survived_child }})</a>
-                <a href="/not_survived?sex=child" class="btn" style="background:#f59e0b;">Not survived — Child ({{ not_survived_child }})</a>
-              {% endif %}
+              {# removed male/female buttons per request #}
             {% endif %}
           </div>
+
+          <!-- moved counts here so they appear below the buttons -->
+          <p class="meta" style="margin-top:12px;">
+            Survived: <strong>{{ survived_count }}</strong> ({{ survived_percent }}%)<br/>
+            Not survived: <strong>{{ not_survived_count }}</strong> ({{ not_survived_percent }}%)
+          </p>
+
           <p style="margin:6px 0 0 0; color:#333;">Click a button to view the full dataset for each group on a separate page.</p>
         </div>
       </div>
@@ -84,7 +133,24 @@
             backgroundColor: ['#2ecc71', '#e74c3c']
           }]
         };
-        new Chart(ctx, { type: 'pie', data: data, options: { responsive: true } });
+        new Chart(ctx, {
+          type: 'pie',
+          data: data,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: { family: 'Times New Roman, Times, serif', size: 16 }
+                }
+              },
+              tooltip: {
+                bodyFont: { family: 'Times New Roman, Times, serif', size: 14 }
+              }
+            }
+          }
+        });
       })();
     </script>
   </body>

@@ -1,15 +1,15 @@
-
 import os
 import re
-import numpy as np
+from typing import Optional
 import pandas as pd
+import numpy as np
 
 
 def _project_root():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 
-def load_data(path: str = None) -> pd.DataFrame:
+def load_data(path: Optional[str] = None) -> pd.DataFrame:
     """Load Titanic dataset (cleaned but same shape)."""
     if path is None:
         path = os.path.join(_project_root(), 'titanic_cleaned_same_shape.csv')

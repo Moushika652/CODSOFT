@@ -1,0 +1,13 @@
+{
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.extraPaths": [
+    "./src"
+  ],
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportUnknownMemberType": "warning",
+    "reportUnknownArgumentType": "warning",
+    "reportMissingTypeStubs": "warning"
+  }
+}

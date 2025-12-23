@@ -2,48 +2,51 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Predictions Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto+Slab:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>{{ app_name }} - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* override fonts and sizing to Times New Roman */
-        body { font-family: "Times New Roman", Times, serif; font-size: 18px; }
-        .page-title { font-size: 2.4rem; }
-        h2 { font-family: "Times New Roman", Times, serif; font-size: 1.6rem; }
+      /* override fonts and sizing to Times New Roman */
+      body { font-family: "Times New Roman", Times, serif; font-size: 18px; }
+      .page-title { font-size: 2.4rem; }
+      h2 { font-family: "Times New Roman", Times, serif; font-size: 1.6rem; }
 
-        /* dashboard grid: ensure left alignment so chart sits on left */
-        .dashboard-grid {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            justify-content: flex-start;
-            flex-wrap: wrap;
-        }
+      /* dashboard grid: ensure left alignment so chart sits on left */
+      .dashboard-grid {
+          display: flex;
+          gap: 20px;
+          align-items: flex-start;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+      }
 
-        /* left column (chart) alignment and sizing */
-        .dashboard-grid .panel.summary {
-            flex: 0 0 360px;
-            max-width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        #survivalChart {
-            width: 100% !important;
-            height: auto !important;
-            max-width: 360px;
-            margin: 0;
-            align-self: flex-start;
-        }
+      /* left column (chart) alignment and sizing */
+      .dashboard-grid .panel.summary {
+          flex: 0 0 360px;
+          max-width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+      }
+      #survivalChart {
+          width: 100% !important;
+          height: auto !important;
+          max-width: 360px;
+          margin: 0;
+          align-self: flex-start;
+      }
 
-        /* increase meta and control font sizes */
-        .meta, .btn, .nav-links, .brand { font-size: 1.05rem; font-family: "Times New Roman", Times, serif; }
+      /* increase meta and control font sizes */
+      .meta, .btn, .nav-links, .brand { font-size: 1.05rem; font-family: "Times New Roman", Times, serif; }
 
-        @media (max-width: 640px) {
-            .dashboard-grid { flex-direction: column; }
-            #survivalChart { max-width: 100%; }
-        }
+      @media (max-width: 640px) {
+          .dashboard-grid { flex-direction: column; }
+          #survivalChart { max-width: 100%; }
+      }
+
+      .stats { display:flex; gap:1rem; align-items:center; margin:1rem 0; }
+      .stat { padding:0.75rem 1rem; border-radius:6px; background:#f5f5f5; }
+      .stat .num { font-size:1.25rem; font-weight:700; }
+      .stat .sub { color:#555; font-size:0.9rem; }
     </style>
   </head>
   <body class="wrap" style="background:var(--bg-2);">
@@ -56,7 +59,7 @@
 
     <div class="card" role="main">
       <header class="site-header">
-        <div class="brand">Titanic Predictions</div>
+        <div class="brand">Titanic Lifeboat Prediction</div>
         <div class="nav-links">
           <span class="user-pill">{{ session.get('username') or 'Guest' }}</span>
           <a href="/download" class="btn btn-primary">Download CSV</a>
@@ -66,17 +69,9 @@
 
       <h2 style="margin-top:0; font-family: 'Roboto Slab', serif;">Predictions Dashboard</h2>
       <p class="meta"><strong>Dataset:</strong> Titanic passenger data. This app displays model predictions for demonstration.</p>
-      <p class="meta"><strong>About these results:</strong> This dashboard groups model predictions into "Survived" and "Not survived" (uses `PredictedProb` when available; default threshold is 0.9). Treat these results as illustrative.</p>
-      {% if threshold_used is not none %}
-      <p class="meta"><strong>Threshold:</strong> {{ threshold_used }}{% if achieved_accuracy is not none %} &mdash; Achieved accuracy: {{ achieved_accuracy }}{% endif %}</p>
-      {% endif %}
+      <p class="meta"><strong>About these results:</strong> This dashboard groups model predictions into "Survived" and "Not survived" (uses `PredictedProb` when available; default threshold is {{ threshold_used }}). Treat these results as illustrative.</p>
       <p class="meta"><strong>Counts:</strong> Survived: {{ survived_count }} &nbsp; | &nbsp; Not survived: {{ not_survived_count }}</p>
-      {% if current_user %}
-      <form method="post" action="{{ url_for('enrich_dataset') }}" style="margin:6px 0;">
-        <button type="submit" class="btn btn-primary">Save enriched dataset (add Sex)</button>
-      </form>
-      {% endif %}
-      <p class="meta"><strong>Percentages:</strong> Survived: {{ survived_percent }}% &nbsp; | &nbsp; Not survived: {{ not_survived_percent }}% &nbsp; | &nbsp; Total: {{ total_count }}</p>
+      <p class="meta"><strong>Percentages:</strong> Survived: {{ survived_percent }}% &nbsp; | &nbsp; Not survived: {{ not_survived_percent }}% &nbsp; | &nbsp; Total: {{ total }}</p>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -121,37 +116,31 @@
       </div>
       {% endif %}
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      (function() {
-        const ctx = document.getElementById('survivalChart');
-        if (!ctx) return;
-        const data = {
-          labels: ['Survived', 'Not survived'],
-          datasets: [{
-            data: [{{ survived_count }}, {{ not_survived_count }}],
-            backgroundColor: ['#2ecc71', '#e74c3c']
-          }]
-        };
-        new Chart(ctx, {
-          type: 'pie',
-          data: data,
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-                labels: {
-                  font: { family: 'Times New Roman, Times, serif', size: 16 }
-                }
-              },
-              tooltip: {
-                bodyFont: { family: 'Times New Roman, Times, serif', size: 14 }
+          (function(){
+            // render pie chart
+            try {
+              const ctx = document.getElementById('survivalChart');
+              if (ctx) {
+                const data = {
+                  labels: ['Survived', 'Not survived'],
+                  datasets: [{
+                    data: [parseInt('{{ survived_count | default(0) }}'), parseInt('{{ not_survived_count | default(0) }}')], 
+                    backgroundColor: ['#2ecc71', '#e74c3c']
+                  }]
+                };
+                new Chart(ctx, { type: 'pie', data: data, options: { responsive: true } });
               }
-            }
-          }
-        });
-      })();
-    </script>
+            } catch (err) { console.warn('Chart init failed', err); }
+
+            // optionally scroll dashboard into view (show chart/actions)
+            try {
+              const grid = document.querySelector('.dashboard-grid');
+              if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (e) { /* ignore */ }
+          })();
+        </script>
   </body>
 </html>

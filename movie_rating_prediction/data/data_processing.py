@@ -5,7 +5,84 @@ from sklearn.impute import SimpleImputer
 
 # Load the dataset
 def load_dataset(file_path):
-    return pd.read_csv(file_path)
+    """
+    Load the raw movies dataset from IMDb Movies India CSV and
+    transform it into the schema expected by the ML pipeline:
+    genres, director, actors, runtime, release_year, vote_count, rating.
+    """
+    # Handle common encoding issues
+    try:
+        raw_df = pd.read_csv(file_path)
+    except UnicodeDecodeError:
+        raw_df = pd.read_csv(file_path, encoding="latin1")
+
+    # Standardize column names used by the rest of the pipeline
+    df = raw_df.copy()
+
+    # Map basic columns if present
+    column_map = {
+        "Genre": "genres",
+        "Director": "director",
+        "Rating": "rating",
+    }
+    for src, dest in column_map.items():
+        if src in df.columns:
+            df[dest] = df[src]
+
+    # Combine actor columns into a single comma‑separated string
+    actor_cols = [c for c in df.columns if c.lower().startswith("actor")]
+    if actor_cols:
+        df["actors"] = (
+            df[actor_cols]
+            .fillna("")
+            .astype(str)
+            .agg(", ".join, axis=1)
+            .str.replace(r"(,\s*)+$", "", regex=True)
+        )
+
+    # Extract runtime in minutes from duration strings like "109 min"
+    if "Duration" in df.columns:
+        df["runtime"] = (
+            df["Duration"]
+            .astype(str)
+            .str.extract(r"(\d+)", expand=False)
+            .astype(float)
+        )
+
+    # Extract numeric year from strings like "(2019)"
+    if "Year" in df.columns:
+        df["release_year"] = (
+            df["Year"]
+            .astype(str)
+            .str.extract(r"(\d{4})", expand=False)
+            .astype(float)
+        )
+
+    # Votes to numeric vote_count (remove commas, handle missing)
+    if "Votes" in df.columns:
+        df["vote_count"] = (
+            df["Votes"]
+            .astype(str)
+            .str.replace(",", "", regex=False)
+        )
+        df["vote_count"] = pd.to_numeric(df["vote_count"], errors="coerce")
+
+    # Keep only the columns required downstream (drop rows missing key fields later)
+    expected_cols = [
+        "genres",
+        "director",
+        "actors",
+        "runtime",
+        "release_year",
+        "vote_count",
+        "rating",
+    ]
+    # Some columns might still be missing; let cleaning handle NaNs but ensure they exist
+    for col in expected_cols:
+        if col not in df.columns:
+            df[col] = pd.NA
+
+    return df[expected_cols]
 
 # Clean the dataset
 def clean_dataset(df):
@@ -14,9 +91,9 @@ def clean_dataset(df):
 
     # Handle missing values with intelligent defaults
     imputer = SimpleImputer(strategy='most_frequent')
-    df['genres'] = imputer.fit_transform(df[['genres']])
-    df['director'] = imputer.fit_transform(df[['director']])
-    df['actors'] = imputer.fit_transform(df[['actors']])
+    df['genres'] = imputer.fit_transform(df[['genres']]).ravel()
+    df['director'] = imputer.fit_transform(df[['director']]).ravel()
+    df['actors'] = imputer.fit_transform(df[['actors']]).ravel()
     df['runtime'] = df['runtime'].fillna(df['runtime'].median())
     df['release_year'] = df['release_year'].fillna(df['release_year'].median())
     df['vote_count'] = df['vote_count'].fillna(0)
@@ -41,7 +118,14 @@ def process_dataset(df):
 
     # Encode director and actors based on historical ratings
     director_ratings = df.groupby('director')['rating'].mean()
-    actor_ratings = df['actors'].str.split(',').explode().groupby(lambda x: x)['rating'].mean()
+
+    # Build per-actor average rating
+    actor_df = df[['actors', 'rating']].copy()
+    actor_df['actors'] = actor_df['actors'].astype(str)
+    actor_df = actor_df.assign(actor=actor_df['actors'].str.split(','))
+    actor_df = actor_df.explode('actor')
+    actor_df['actor'] = actor_df['actor'].str.strip()
+    actor_ratings = actor_df.groupby('actor')['rating'].mean()
 
     df['director_score'] = df['director'].map(director_ratings)
     df['actors_score'] = df['actors'].apply(

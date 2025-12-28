@@ -1,18 +1,12 @@
 import os
 from typing import Optional, Tuple
 
-from functools import wraps
-from urllib.parse import urlparse, urljoin
-
-from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 
 import pandas as pd
 
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('FLASK_SECRET', 'dev-secret')
-
-DEMO_USER: str = os.environ.get('DEMO_USER', 'admin')
-DEMO_PASS: str = os.environ.get('DEMO_PASS', 'admin')
 
 PREDICTIONS_CSV: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'predictions_all.csv'))
 DEFAULT_THRESHOLD = float(os.environ.get('SURVIVAL_THRESHOLD', 0.7))
@@ -29,24 +23,9 @@ def load_predictions(path: Optional[str] = None) -> pd.DataFrame:
     return df
 
 
-def is_safe_url(target: str) -> bool:
-    base = str(request.host_url)
-    ref_url = urlparse(base)
-    test_url = urlparse(urljoin(base, target))
-    return (test_url.scheme in ('http', 'https')) and (ref_url.netloc == test_url.netloc)
-
-
-def login_required(f):
-    @wraps(f) # type: ignore
-    def decorated(*args, **kwargs):
-        # no-op: allow access without login
-        return f(*args, **kwargs)
-    return decorated
-
-
 @app.context_processor
 def inject_user() -> dict:
-    return {"app_name": "Titanic Survival", "user": DEMO_USER}
+    return {"app_name": "Titanic Survival"}
 
 
 @app.route('/')
@@ -54,29 +33,7 @@ def index():
     return redirect(url_for('dashboard'))
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    next_url = request.args.get('next') or request.form.get('next') or url_for('dashboard')
-    if request.method == 'POST':
-        user = request.form.get('username')
-        pw = request.form.get('password')
-        if user == DEMO_USER and pw == DEMO_PASS:
-            session['username'] = user
-            if is_safe_url(next_url):
-                return redirect(next_url)
-            return redirect(url_for('dashboard'))
-        flash('Invalid credentials', 'danger')
-    return render_template('login.html', next=next_url)
-
-
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    return redirect(url_for('login'))
-
-
 @app.route('/dashboard')
-@login_required
 def dashboard():
     df = load_predictions()
     total = len(df) if df is not None else 0
@@ -132,7 +89,6 @@ def _split_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
 
 
 @app.route('/survived')
-@login_required
 def view_survived():
     df = load_predictions()
     s, _ = _split_df(df)
@@ -141,7 +97,6 @@ def view_survived():
 
 
 @app.route('/not_survived')
-@login_required
 def view_not_survived():
     df = load_predictions()
     _, ns = _split_df(df)
@@ -150,7 +105,6 @@ def view_not_survived():
 
 
 @app.route('/download')
-@login_required
 def download():
     if not os.path.exists(PREDICTIONS_CSV):
         flash("No predictions file available.", "warning")
@@ -159,7 +113,6 @@ def download():
 
 
 @app.route('/enrich', methods=['POST'])
-@login_required
 def enrich():
     # lightweight placeholder: accept form and re-save CSV if present
     df = load_predictions()

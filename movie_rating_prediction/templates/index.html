@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Rating Prediction App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .help-text {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .predict-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .predict-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .predict-button:active {
+            transform: translateY(0);
+        }
+
+        .predict-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .rating-display {
+            text-align: center;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .movie-details {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid #c33;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .movie-results {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .movie-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .movie-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .movie-rating {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .movie-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .star-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+
+        .star-rating .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star-rating .star {
+            color: #ffd700;
+            font-size: 1.5em;
+        }
+
+        .star-rating .star.empty {
+            color: #ddd;
+        }
+
+        .star-rating .rating-text {
+            font-weight: bold;
+            color: #667eea;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Movie Rating Predictor</h1>
+        <p class="subtitle">Search movies or predict ratings</p>
+
+        {% if model_loaded %}
+        <div class="status-badge status-ready">✓ Model Ready</div>
+        {% else %}
+        <div class="status-badge status-loading">⏳ Loading Model...</div>
+        {% endif %}
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('search')">🔍 Search Movies</button>
+            <button class="tab-button" onclick="switchTab('predict')">🔮 Predict Rating</button>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="search-tab" class="tab-content active">
+            <form id="search-form">
+                <div class="form-group">
+                    <label for="search_movie_name">Search Movies</label>
+                    <input type="text" id="search_movie_name" name="search_movie_name" required 
+                           placeholder="e.g., action, Leonardo, Dark, comedy, thriller">
+                    <div class="help-text">Search by movie name, genre, actor, or director - any word works!</div>
+                </div>
+                <button type="submit" class="search-button">Search Movies</button>
+            </form>
+
+            <div class="loading" id="search-loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">Searching movies...</p>
+            </div>
+
+            <div class="error-message" id="search-error-message"></div>
+
+            <div class="movie-results" id="movie-results"></div>
+        </div>
+
+        <!-- Predict Tab -->
+        <div id="predict-tab" class="tab-content">
+        <form id="prediction-form">
+            <div class="form-group">
+                <label for="movie_name">Movie Name *</label>
+                <input type="text" id="movie_name" name="movie_name" required 
+                       placeholder="e.g., The Dark Knight">
+            </div>
+
+            <div class="form-group">
+                <label for="genre">Genre *</label>
+                <input type="text" id="genre" name="genre" required 
+                       placeholder="e.g., Action, Drama, Crime">
+                <div class="help-text">You can enter multiple genres separated by commas</div>
+            </div>
+
+            <div class="form-group">
+                <label for="actor">Actor *</label>
+                <input type="text" id="actor" name="actor" required 
+                       placeholder="e.g., Christian Bale">
+                <div class="help-text">Enter the main actor's name</div>
+            </div>
+
+            <div class="form-group">
+                <label for="votes">Number of Votes *</label>
+                <input type="number" id="votes" name="votes" required 
+                       placeholder="e.g., 2500000" min="0">
+                <div class="help-text">Enter the expected number of votes</div>
+            </div>
+
+            <button type="submit" class="predict-button" {% if not model_loaded %}disabled{% endif %}>
+                Predict Rating
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #666;">Processing prediction...</p>
+        </div>
+
+        <div class="error-message" id="error-message"></div>
+
+        <div class="result-container" id="result-container">
+            <div class="result-title">Prediction Result</div>
+            <div class="rating-display" id="rating-display">
+                <div class="star-rating">
+                    <span class="rating-text">-</span>
+                </div>
+            </div>
+            <div class="movie-details" id="movie-details"></div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to generate star rating display
+        function generateStarRating(rating) {
+            if (rating === null || rating === undefined || isNaN(rating)) {
+                return '<span>N/A</span>';
+            }
+            
+            const numRating = parseFloat(rating);
+            const fullStars = Math.floor(numRating);
+            const hasHalfStar = (numRating % 1) >= 0.5;
+            const totalFilled = fullStars + (hasHalfStar ? 1 : 0);
+            const emptyStars = 10 - totalFilled;
+            
+            let starsHTML = '<div class="stars">';
+            
+            // Full stars
+            for (let i = 0; i < fullStars; i++) {
+                starsHTML += '<span class="star">⭐</span>';
+            }
+            
+            // Half star (show as full for simplicity, or could use half-star emoji)
+            if (hasHalfStar) {
+                starsHTML += '<span class="star">⭐</span>';
+            }
+            
+            // Empty stars
+            for (let i = 0; i < emptyStars; i++) {
+                starsHTML += '<span class="star empty">☆</span>';
+            }
+            
+            starsHTML += '</div>';
+            starsHTML += `<span class="rating-text">${numRating.toFixed(1)}/10</span>`;
+            
+            return starsHTML;
+        }
+
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab
+            if (tab === 'search') {
+                document.getElementById('search-tab').classList.add('active');
+                document.querySelectorAll('.tab-button')[0].classList.add('active');
+            } else {
+                document.getElementById('predict-tab').classList.add('active');
+                document.querySelectorAll('.tab-button')[1].classList.add('active');
+            }
+        }
+
+        // Search form handler
+        const searchForm = document.getElementById('search-form');
+        const searchLoading = document.getElementById('search-loading');
+        const searchErrorMessage = document.getElementById('search-error-message');
+        const movieResults = document.getElementById('movie-results');
+
+        searchForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            movieResults.innerHTML = '';
+            searchErrorMessage.classList.remove('show');
+            searchLoading.classList.add('show');
+
+            const movieName = document.getElementById('search_movie_name').value.trim();
+
+            try {
+                const response = await fetch('/search_movie', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ movie_name: movieName })
+                });
+
+                const data = await response.json();
+                searchLoading.classList.remove('show');
+
+                if (data.success) {
+                    if (data.movies.length === 0) {
+                        movieResults.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No movies found. Try a different search term.</p>';
+                    } else {
+                        let html = `<p style="margin-bottom: 15px; color: #666; font-weight: 600;">Found ${data.count} movie(s) related to your search:</p>`;
+                        data.movies.forEach(movie => {
+                            const matchBadge = movie.matched_in ? 
+                                `<span style="background: #e3f2fd; color: #1976d2; padding: 3px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 10px;">Matched: ${movie.matched_in}</span>` : '';
+                            html += `
+                                <div class="movie-card">
+                                    <h3>${movie.name}${matchBadge}</h3>
+                                    <div class="star-rating">
+                                        ${generateStarRating(movie.rating)}
+                                    </div>
+                                    <div class="movie-info">
+                                        <div><strong>Year:</strong> ${movie.year || 'N/A'}</div>
+                                        <div><strong>Genre:</strong> ${movie.genre}</div>
+                                        <div><strong>Director:</strong> ${movie.director}</div>
+                                        <div><strong>Main Actor:</strong> ${movie.actor1}</div>
+                                        <div><strong>Votes:</strong> ${movie.votes ? movie.votes.toLocaleString() : 'N/A'}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        movieResults.innerHTML = html;
+                    }
+                } else {
+                    searchErrorMessage.textContent = data.error || 'Search failed';
+                    searchErrorMessage.classList.add('show');
+                }
+            } catch (error) {
+                searchLoading.classList.remove('show');
+                searchErrorMessage.textContent = 'Network error: ' + error.message;
+                searchErrorMessage.classList.add('show');
+            }
+        });
+
+        // Prediction form handler
+        const form = document.getElementById('prediction-form');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+        const resultContainer = document.getElementById('result-container');
+        const ratingDisplay = document.getElementById('rating-display');
+        const movieDetails = document.getElementById('movie-details');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Hide previous results and errors
+            resultContainer.classList.remove('show');
+            errorMessage.classList.remove('show');
+            loading.classList.add('show');
+
+            // Get form data
+            const formData = {
+                movie_name: document.getElementById('movie_name').value,
+                genre: document.getElementById('genre').value,
+                actor: document.getElementById('actor').value,
+                votes: document.getElementById('votes').value
+            };
+
+            try {
+                const response = await fetch('/predict_rating', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                loading.classList.remove('show');
+
+                if (data.success) {
+                    // Display result with star rating
+                    const starRatingHTML = generateStarRating(data.predicted_rating);
+                    ratingDisplay.innerHTML = `<div class="star-rating">${starRatingHTML}</div>`;
+                    movieDetails.innerHTML = `
+                        <div class="detail-row">
+                            <span class="detail-label">Movie Name:</span>
+                            <span class="detail-value">${data.movie_name}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Genre:</span>
+                            <span class="detail-value">${data.genre}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Actor:</span>
+                            <span class="detail-value">${data.actor}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Votes:</span>
+                            <span class="detail-value">${data.votes.toLocaleString()}</span>
+                        </div>
+                    `;
+                    resultContainer.classList.add('show');
+                } else {
+                    // Display error
+                    errorMessage.textContent = data.error || 'An error occurred';
+                    errorMessage.classList.add('show');
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                errorMessage.textContent = 'Network error: ' + error.message;
+                errorMessage.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

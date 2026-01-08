@@ -1,0 +1,1 @@
+The Titanic Survival Prediction app uses machine learning to predict whether a passenger survived the Titanic disaster. It analyzes features such as age, gender, passenger class, fare, and family details to generate accurate survival predictions, demonstrating real-world data analysis and classification.

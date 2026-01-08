@@ -28,7 +28,6 @@ def tune(n_iter=12, cv=3, random_state=42):
     models = get_models()
 
     results = {}
-    # Random forest param distribution
     rf_param = {
         'clf__n_estimators': [100, 200, 500],
         'clf__max_depth': [None, 5, 10, 20],
@@ -36,7 +35,6 @@ def tune(n_iter=12, cv=3, random_state=42):
         'clf__max_features': ['sqrt', 'log2', None]
     }
 
-    # Gradient boosting param distribution
     gb_param = {
         'clf__n_estimators': [100, 200, 300],
         'clf__learning_rate': [0.01, 0.05, 0.1, 0.2],
@@ -60,7 +58,6 @@ def tune(n_iter=12, cv=3, random_state=42):
         print('Best CV score (f1):', rnd.best_score_)
         results[name] = {'best_estimator': rnd.best_estimator_, 'best_score': float(rnd.best_score_), 'best_params': rnd.best_params_}
 
-        # Save best estimator
         models_dir = os.path.join(_project_root(), 'models')
         os.makedirs(models_dir, exist_ok=True)
         save_path = os.path.join(models_dir, f'{name}_tuned_pipeline.joblib')

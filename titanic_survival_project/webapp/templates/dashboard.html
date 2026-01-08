@@ -5,12 +5,10 @@
     <title>{{ app_name }} - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-      /* override fonts and sizing to Times New Roman */
       body { font-family: "Times New Roman", Times, serif; font-size: 18px; }
       .page-title { font-size: 2.4rem; }
       h2 { font-family: "Times New Roman", Times, serif; font-size: 1.6rem; }
 
-      /* dashboard grid: ensure left alignment so chart sits on left */
       .dashboard-grid {
           display: flex;
           gap: 20px;
@@ -19,7 +17,6 @@
           flex-wrap: wrap;
       }
 
-      /* left column (chart) alignment and sizing */
       .dashboard-grid .panel.summary {
           flex: 0 0 360px;
           max-width: 100%;
@@ -35,7 +32,6 @@
           align-self: flex-start;
       }
 
-      /* increase meta and control font sizes */
       .meta, .btn, .nav-links, .brand { font-size: 1.05rem; font-family: "Times New Roman", Times, serif; }
 
       @media (max-width: 640px) {
@@ -87,7 +83,6 @@
           <h3 style="margin:0 0 8px 0;">Survival Summary</h3>
           <canvas id="survivalChart" width="300" height="300"></canvas>
           <div style="margin-top:12px;">
-            <!-- 'By group' table removed per request -->
             {% if inferred_sex_count and inferred_sex_count > 0 %}
               <p class="meta">Inferred Sex for <strong>{{ inferred_sex_count }}</strong> rows from `Name`.</p>
             {% endif %}
@@ -99,11 +94,9 @@
             <a href="/survived" class="btn btn-success" style="flex:1; min-width:180px">View Survived ({{ survived_count }})</a>
             <a href="/not_survived" class="btn btn-danger" style="flex:1; min-width:180px">View Not survived ({{ not_survived_count }})</a>
             {% if sex_col or age_col %}
-              {# removed male/female buttons per request #}
             {% endif %}
           </div>
 
-          <!-- moved counts here so they appear below the buttons -->
           <p class="meta" style="margin-top:12px;">
             Survived: <strong>{{ survived_count }}</strong> ({{ survived_percent }}%)<br/>
             Not survived: <strong>{{ not_survived_count }}</strong> ({{ not_survived_percent }}%)
@@ -118,7 +111,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
           (function(){
-            // render pie chart
             try {
               const ctx = document.getElementById('survivalChart');
               if (ctx) {
@@ -133,11 +125,10 @@
               }
             } catch (err) { console.warn('Chart init failed', err); }
 
-            // optionally scroll dashboard into view (show chart/actions)
             try {
               const grid = document.querySelector('.dashboard-grid');
               if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } catch (e) { /* ignore */ }
+            } catch (e) { }
           })();
         </script>
   </body>

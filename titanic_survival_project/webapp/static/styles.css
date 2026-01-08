@@ -10,7 +10,6 @@
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
 }
 
-/* Landing page styles */
 .landing-hero{
   background: linear-gradient(135deg,#0ea5e9 0%, #0ea5ff 45%, #3b82f6 100%);
   color: #fff;
@@ -33,7 +32,6 @@
 .feature-card p{margin:0; color:rgba(255,255,255,0.92)}
 .feature-icon{width:56px; height:56px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; color:#111; font-size:26px; margin-bottom:12px}
 
-/* colorful feature card variants */
 .features-grid .feature-card:nth-child(1){background:linear-gradient(135deg,#4f46e5,#6d28d9)}
 .features-grid .feature-card:nth-child(2){background:linear-gradient(135deg,#10b981,#059669)}
 .features-grid .feature-card:nth-child(3){background:linear-gradient(135deg,#f97316,#f43f5e)}
@@ -41,7 +39,6 @@
 .features-grid .feature-card:nth-child(5){background:linear-gradient(135deg,#f59e0b,#d97706)}
 .features-grid .feature-card:nth-child(6){background:linear-gradient(135deg,#3b82f6,#2563eb)}
 
-/* icon badge colors */
 .icon-camera{background:#ffd54a}
 .icon-brain{background:#a78bfa}
 .icon-trophy{background:#fb7185}
@@ -64,25 +61,21 @@
 
 html,body{height:100%; margin:0}
 
-/* Generic container */
 .wrap{min-height:100%; display:flex; align-items:center; justify-content:center; padding:28px; box-sizing:border-box}
 
 .card{background:var(--card-bg); padding:22px; border-radius:var(--radius); box-shadow:0 10px 30px rgba(2,6,23,0.06); max-width:1200px; width:100%;}
 
-/* Header */
 .site-header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
 .brand{font-family:'Merriweather', serif; font-size:20px; color:var(--accent); font-weight:700}
 .nav-links{display:flex; gap:12px; align-items:center}
 .nav-links a{color:var(--accent); text-decoration:none; font-weight:600}
 .user-pill{background:rgba(11,99,163,0.08); padding:6px 10px; border-radius:999px; font-size:0.95rem}
 
-/* Buttons */
 .btn{display:inline-block; padding:10px 14px; border-radius:10px; text-decoration:none; color:#fff; font-weight:700; text-align:center}
 .btn-primary{background:var(--accent)}
 .btn-success{background:var(--success)}
 .btn-danger{background:var(--danger)}
 
-/* Login form */
 .login-card{width:380px}
 label{display:block; margin:12px 0 6px; font-weight:600}
 input[type=text],input[type=password]{width:100%; padding:12px 14px; border-radius:8px; border:1px solid rgba(11,61,145,0.12); font-size:15px; box-sizing:border-box}
@@ -93,7 +86,6 @@ button[type=submit]{margin-top:14px; width:100%; padding:12px 14px; background:v
 .flash.danger{background:rgba(183,28,28,0.07); color:#b71c1c}
 .flash.success{background:rgba(46,204,113,0.08); color:#12703a}
 
-/* Dashboard layout */
 .dashboard-grid{display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start}
 .panel{background:rgba(255,255,255,0.95); padding:12px; border-radius:8px}
 .summary{flex:0 0 360px}
@@ -104,7 +96,6 @@ table{border-collapse:collapse; width:100%; font-size:14px}
 th{background:linear-gradient(90deg,#4b79a1,#283e51); color:#fff; padding:10px; text-align:left}
 td{border:1px solid rgba(0,0,0,0.06); padding:8px}
 
-/* Responsive */
 @media (max-width:880px){
   .login-card{width:100%;}
   .card{padding:16px}
@@ -112,17 +103,14 @@ td{border:1px solid rgba(0,0,0,0.06); padding:8px}
   .actions{flex:1 1 100%}
 }
 
-/* Subset table overrides */
 .subset-card{max-height:75vh; overflow:auto}
 
-/* Violet background for subset pages (survived / not_survived) */
 .subset-bg{background:linear-gradient(180deg,#6b5bff 0%, #9b6bff 60%);}
 .card.subset-card{background:rgba(255,255,255,0.06); color:#fff; box-shadow:none}
 .card.subset-card table th{background:rgba(255,255,255,0.08); color:#fff}
 .card.subset-card td{color:rgba(255,255,255,0.95); border-color:rgba(255,255,255,0.06)}
 .card.subset-card a.btn{background:rgba(255,255,255,0.12); color:#fff}
 
-/* Full-bleed hero + centered translucent modal for login */
 .full-hero{position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:40px 20px; background:linear-gradient(180deg,#3b0f6f 0%, #5b21b6 45%, #7c3aed 100%); color:#fff}
 .full-hero .hero-header{position:absolute; top:20px; left:0; right:0; max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:0 20px}
 .modal-card{width:420px; max-width:92vw; background:rgba(255,255,255,0.06); backdrop-filter:blur(8px); border-radius:14px; padding:24px; box-shadow:0 20px 60px rgba(11,11,30,0.55); color:#fff}
@@ -138,7 +126,6 @@ td{border:1px solid rgba(0,0,0,0.06); padding:8px}
   .modal-card{width:92vw}
 }
 
-/* Polished login controls */
 .modal-logo{display:flex; align-items:center; gap:12px; margin-bottom:10px}
 .modal-logo .mark{width:44px; height:44px; border-radius:10px; background:linear-gradient(180deg,#ffd54a,#ffb300); display:flex; align-items:center; justify-content:center; font-weight:800; color:#222}
 .social-row{display:flex; gap:10px; margin-bottom:12px}
@@ -156,7 +143,6 @@ td{border:1px solid rgba(0,0,0,0.06); padding:8px}
 .modal-card .flash{background:rgba(255,255,255,0.08); color:#fff}
 .modal-card small{display:block; margin-top:10px; color:rgba(255,255,255,0.75)}
 
-/* subtle entrance */
 .modal-card{transform:translateY(6px); transition:transform .28s ease, box-shadow .28s ease}
 .full-hero .modal-card.visible{transform:translateY(0); box-shadow:0 20px 60px rgba(11,11,30,0.5)}
 

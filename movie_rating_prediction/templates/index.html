@@ -376,7 +376,6 @@
             <button class="tab-button" onclick="switchTab('predict')">🔮 Predict Rating</button>
         </div>
 
-        <!-- Search Tab -->
         <div id="search-tab" class="tab-content active">
             <form id="search-form">
                 <div class="form-group">
@@ -398,7 +397,6 @@
             <div class="movie-results" id="movie-results"></div>
         </div>
 
-        <!-- Predict Tab -->
         <div id="predict-tab" class="tab-content">
         <form id="prediction-form">
             <div class="form-group">
@@ -453,7 +451,6 @@
     </div>
 
     <script>
-        // Function to generate star rating display
         function generateStarRating(rating) {
             if (rating === null || rating === undefined || isNaN(rating)) {
                 return '<span>N/A</span>';
@@ -467,17 +464,14 @@
             
             let starsHTML = '<div class="stars">';
             
-            // Full stars
             for (let i = 0; i < fullStars; i++) {
                 starsHTML += '<span class="star">⭐</span>';
             }
             
-            // Half star (show as full for simplicity, or could use half-star emoji)
             if (hasHalfStar) {
                 starsHTML += '<span class="star">⭐</span>';
             }
             
-            // Empty stars
             for (let i = 0; i < emptyStars; i++) {
                 starsHTML += '<span class="star empty">☆</span>';
             }
@@ -489,7 +483,6 @@
         }
 
         function switchTab(tab) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
@@ -497,7 +490,6 @@
                 button.classList.remove('active');
             });
 
-            // Show selected tab
             if (tab === 'search') {
                 document.getElementById('search-tab').classList.add('active');
                 document.querySelectorAll('.tab-button')[0].classList.add('active');
@@ -507,7 +499,6 @@
             }
         }
 
-        // Search form handler
         const searchForm = document.getElementById('search-form');
         const searchLoading = document.getElementById('search-loading');
         const searchErrorMessage = document.getElementById('search-error-message');
@@ -571,7 +562,6 @@
             }
         });
 
-        // Prediction form handler
         const form = document.getElementById('prediction-form');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('error-message');
@@ -582,12 +572,10 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Hide previous results and errors
             resultContainer.classList.remove('show');
             errorMessage.classList.remove('show');
             loading.classList.add('show');
 
-            // Get form data
             const formData = {
                 movie_name: document.getElementById('movie_name').value,
                 genre: document.getElementById('genre').value,
@@ -608,7 +596,6 @@
                 loading.classList.remove('show');
 
                 if (data.success) {
-                    // Display result with star rating
                     const starRatingHTML = generateStarRating(data.predicted_rating);
                     ratingDisplay.innerHTML = `<div class="star-rating">${starRatingHTML}</div>`;
                     movieDetails.innerHTML = `
@@ -631,7 +618,6 @@
                     `;
                     resultContainer.classList.add('show');
                 } else {
-                    // Display error
                     errorMessage.textContent = data.error || 'An error occurred';
                     errorMessage.classList.add('show');
                 }

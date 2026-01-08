@@ -11,10 +11,6 @@ import numpy as np
 
 
 class NovelFeatureAdder(BaseEstimator, TransformerMixin):
-    """Custom transformer that computes `FamilyCohesion` and `NormalizedFare` when needed.
-
-    This demonstrates a custom, less-common feature construction inside the sklearn pipeline.
-    """
     def __init__(self, ticket_col='Ticket'):
         self.ticket_col = ticket_col
 
@@ -23,11 +19,8 @@ class NovelFeatureAdder(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         X = X.copy()
-        # if columns already present, leave them
         if 'FamilyCohesion' not in X.columns:
-            # approximate cohesion with family size and age std (if Age present)
             if 'FamilySize' in X.columns and 'Age' in X.columns and self.ticket_col in X.columns:
-                # compute age std grouped by ticket
                 age_std = X.groupby(self.ticket_col)['Age'].transform('std').fillna(0)
                 X['FamilyCohesion'] = X['FamilySize'] * np.exp(-0.1 * age_std)
             else:
@@ -49,7 +42,6 @@ def build_preprocessor(numeric_features, categorical_features, with_novel=True):
         ('ohe', OneHotEncoder(handle_unknown='ignore'))
     ])
 
-    # we put NovelFeatureAdder before ColumnTransformer when requested
     preprocessor = None
     if with_novel:
         preprocessor = Pipeline(steps=[

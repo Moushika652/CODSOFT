@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Sales Predictions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .exports-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .exports-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .exports-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .exports-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .predictions-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        .predictions-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .predictions-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .predictions-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .predictions-table tr:hover {
+            background: #f5f5f5;
+        }
+        .predictions-table tr:last-child td {
+            border-bottom: none;
+        }
+        .no-predictions {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .no-predictions-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .count-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="exports-container">
+            <div class="exports-header">
+                <a href="/" class="back-btn">← Back to Predictions</a>
+                <h1>📊 All Sales Predictions</h1>
+                <p>Complete history of all predictions made</p>
+                {% if count > 0 %}
+                <div class="count-badge">Total Predictions: {{ count }}</div>
+                <a href="/download-predictions" class="back-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-left: 10px;">📥 Download CSV</a>
+                {% endif %}
+            </div>
+
+            {% if count == 0 %}
+            <div class="no-predictions">
+                <div class="no-predictions-icon">📭</div>
+                <h2>No Predictions Yet</h2>
+                <p>Make your first prediction to see it here!</p>
+            </div>
+            {% else %}
+            <div class="predictions-table">
+                <table>
+                    <thead>
+                        <tr>
+                            {% for key in predictions[0].keys() %}
+                            <th>{{ key.replace('_', ' ').title() }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prediction in predictions %}
+                        <tr>
+                            {% for key, value in prediction.items() %}
+                            <td>
+                                {% if 'Sales' in key %}
+                                    <strong style="color: #667eea;">₹{{ "%.2f"|format(value|float) }}</strong>
+                                {% else %}
+                                    {{ "%.2f"|format(value|float) }}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Sales Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="background-animation">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+
+        <div class="main-content">
+            <header class="header">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <h1>Analytics Dashboard</h1>
+                </div>
+                <p class="subtitle">Comprehensive sales prediction insights and trends</p>
+            </header>
+
+            <!-- Navigation Tabs -->
+            <div class="card">
+                <div class="tab-navigation">
+                    <button class="tab-btn active" onclick="switchTab('overview')">📈 Overview</button>
+                    <button class="tab-btn" onclick="switchTab('timeline')">📅 Timeline</button>
+                    <button class="tab-btn" onclick="switchTab('comparison')">⚖️ Comparison</button>
+                    <button class="tab-btn" onclick="switchTab('forecast')">🔮 Forecast</button>
+                    <button class="tab-btn" onclick="switchTab('patterns')">🎯 Patterns</button>
+                </div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📊 Overview Statistics</h2>
+                        <p>Key metrics and summary statistics</p>
+                    </div>
+                    <div class="stats-grid" id="overviewStats">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <span>Loading statistics...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📊 Channel Performance</h2>
+                        <p>Advertising channel contribution analysis</p>
+                    </div>
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <canvas id="channelBarChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="channelPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Tab -->
+            <div id="timeline-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📅 Predictions Timeline</h2>
+                        <p>Historical prediction trends over time</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Tab -->
+            <div id="comparison-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>⚖️ Prediction Comparison</h2>
+                        <p>Compare predictions against averages and identify significant differences</p>
+                    </div>
+                    <div id="comparisonContent">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <span>Loading comparison data...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forecast Tab -->
+            <div id="forecast-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🔮 Future Forecast</h2>
+                        <p>7-day sales prediction forecast</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patterns Tab -->
+            <div id="patterns-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🎯 Seasonal Patterns</h2>
+                        <p>Time-based patterns in sales predictions</p>
+                    </div>
+                    <div class="patterns-grid">
+                        <div class="pattern-card">
+                            <h3>Hourly Patterns</h3>
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                        <div class="pattern-card">
+                            <h3>Daily Patterns</h3>
+                            <canvas id="dailyChart"></canvas>
+                        </div>
+                        <div class="pattern-card">
+                            <h3>Monthly Patterns</h3>
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>📥 Export Reports</h2>
+                    <p>Download comprehensive analytics reports</p>
+                </div>
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="downloadCSV()">
+                        <span>📊 Download CSV</span>
+                    </button>
+                    <button class="export-btn" onclick="generatePDF()">
+                        <span>📄 Generate PDF Report</span>
+                    </button>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p>Advanced Analytics Dashboard • Real-time Insights</p>
+            </footer>
+        </div>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='/'">
+        <span>← Back to Prediction</span>
+    </button>
+
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>

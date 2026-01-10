@@ -6,16 +6,20 @@ let comparisonData = null;
 // Initialize dashboard
 window.addEventListener('load', async () => {
     await loadDashboardData();
-    initializeCharts();
     setupEventListeners();
 });
 
 async function loadDashboardData() {
+    console.log('Starting dashboard data load...');
     try {
         // Load time series data
+        console.log('Fetching time series data...');
         const timeSeriesResponse = await fetch('/time-series-analysis');
+        console.log('Time series response status:', timeSeriesResponse.status);
+        
         if (timeSeriesResponse.ok) {
             timeSeriesData = await timeSeriesResponse.json();
+            console.log('Time series data loaded:', timeSeriesData);
         } else {
             const errorData = await timeSeriesResponse.json();
             console.error('Time series data not available:', errorData.error);
@@ -25,23 +29,33 @@ async function loadDashboardData() {
         }
 
         // Load comparison data
+        console.log('Fetching comparison data...');
         const comparisonResponse = await fetch('/prediction-comparison');
+        console.log('Comparison response status:', comparisonResponse.status);
+        
         if (comparisonResponse.ok) {
             comparisonData = await comparisonResponse.json();
+            console.log('Comparison data loaded:', comparisonData);
         } else {
             const errorData = await comparisonResponse.json();
             console.error('Comparison data not available:', errorData.error);
             showToast(errorData.error || 'Comparison data not available', 'info');
         }
 
+        console.log('Updating UI...');
         updateOverviewStats();
         updateComparisonContent();
+        initializeCharts();
         
     } catch (error) {
         console.error('Error loading dashboard data:', error);
-        showToast('Error loading dashboard data', 'error');
+        showToast('Error loading dashboard data: ' + error.message, 'error');
         // Try to load basic data as fallback
         await loadBasicPredictionData();
+        // Update UI with whatever data we have
+        updateOverviewStats();
+        updateComparisonContent();
+        initializeCharts();
     }
 }
 
@@ -123,13 +137,6 @@ function updateOverviewStats() {
             <div class="stat-content">
                 <h3>${(trend.direction || 'Unknown').charAt(0).toUpperCase() + (trend.direction || 'Unknown').slice(1).replace('_', ' ')}</h3>
                 <p>Trend Direction</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">🎯</div>
-            <div class="stat-content">
-                <h3>${(trend.r_squared || 0).toFixed(3)}</h3>
-                <p>Trend Accuracy</p>
             </div>
         </div>
     `;
@@ -238,12 +245,12 @@ function initializeChannelCharts() {
         const pieCtx = document.getElementById('channelPieChart');
         
         if (barCtx) {
-            barCtx.getContext('2d').font = '16px Poppins';
+            barCtx.getContext('2d').font = '16px Times New Roman';
             barCtx.getContext('2d').fillText('📊 Need more predictions for channel analysis', 50, 150);
         }
         
         if (pieCtx) {
-            pieCtx.getContext('2d').font = '16px Poppins';
+            pieCtx.getContext('2d').font = '16px Times New Roman';
             pieCtx.getContext('2d').fillText('📊 Need more predictions for channel analysis', 50, 150);
         }
         
@@ -359,12 +366,12 @@ function initializeChannelCharts() {
         const pieCtx = document.getElementById('channelPieChart');
         
         if (barCtx) {
-            barCtx.getContext('2d').font = '16px Poppins';
+            barCtx.getContext('2d').font = '16px Times New Roman';
             barCtx.getContext('2d').fillText('📊 No advertising data available', 50, 150);
         }
         
         if (pieCtx) {
-            pieCtx.getContext('2d').font = '16px Poppins';
+            pieCtx.getContext('2d').font = '16px Times New Roman';
             pieCtx.getContext('2d').fillText('📊 No advertising data available', 50, 150);
         }
     }
@@ -374,7 +381,7 @@ function initializeTimelineChart() {
     if (!timeSeriesData || !timeSeriesData.recent_predictions || timeSeriesData.recent_predictions.length === 0) {
         const ctx = document.getElementById('timelineChart');
         if (ctx) {
-            ctx.getContext('2d').font = '16px Poppins';
+            ctx.getContext('2d').font = '16px Times New Roman';
             ctx.getContext('2d').fillText('📊 Need more predictions for timeline analysis', 50, 150);
         }
         showToast('Need at least 1 prediction for timeline analysis', 'info');
@@ -426,7 +433,7 @@ function initializeForecastChart() {
     if (!timeSeriesData || !timeSeriesData.forecast || timeSeriesData.forecast.length === 0) {
         const ctx = document.getElementById('forecastChart');
         if (ctx) {
-            ctx.getContext('2d').font = '16px Poppins';
+            ctx.getContext('2d').font = '16px Times New Roman';
             ctx.getContext('2d').fillText('🔮 Need 5+ predictions for forecasting', 50, 150);
         }
         showToast('Need at least 5 predictions for forecasting', 'info');
@@ -481,7 +488,7 @@ function initializePatternCharts() {
         ['hourlyChart', 'dailyChart', 'monthlyChart'].forEach(chartId => {
             const ctx = document.getElementById(chartId);
             if (ctx) {
-                ctx.getContext('2d').font = '16px Poppins';
+                ctx.getContext('2d').font = '16px Times New Roman';
                 ctx.getContext('2d').fillText('🎯 Need 5+ predictions for pattern analysis', 50, 150);
             }
         });
@@ -527,7 +534,7 @@ function initializePatternCharts() {
     } else {
         const hourlyCtx = document.getElementById('hourlyChart');
         if (hourlyCtx) {
-            hourlyCtx.getContext('2d').font = '16px Poppins';
+            hourlyCtx.getContext('2d').font = '16px Times New Roman';
             hourlyCtx.getContext('2d').fillText('🎯 No hourly data available', 50, 150);
         }
     }
@@ -569,7 +576,7 @@ function initializePatternCharts() {
     } else {
         const dailyCtx = document.getElementById('dailyChart');
         if (dailyCtx) {
-            dailyCtx.getContext('2d').font = '16px Poppins';
+            dailyCtx.getContext('2d').font = '16px Times New Roman';
             dailyCtx.getContext('2d').fillText('🎯 No daily data available', 50, 150);
         }
     }
@@ -611,7 +618,7 @@ function initializePatternCharts() {
     } else {
         const monthlyCtx = document.getElementById('monthlyChart');
         if (monthlyCtx) {
-            monthlyCtx.getContext('2d').font = '16px Poppins';
+            monthlyCtx.getContext('2d').font = '16px Times New Roman';
             monthlyCtx.getContext('2d').fillText('🎯 No monthly data available', 50, 150);
         }
     }
@@ -636,7 +643,16 @@ function switchTab(tabName) {
 }
 
 function setupEventListeners() {
-    // Add any additional event listeners here
+    // Add tab click listeners
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabName = this.getAttribute('onclick').match(/switchTab\('([^']+)\)/)[1];
+            if (tabName) {
+                switchTab(tabName);
+            }
+        });
+    });
 }
 
 function downloadCSV() {

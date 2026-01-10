@@ -86,7 +86,8 @@ python app.py
 
 3. Open your browser and go to:
 ```
-http://127.0.0.1:5000
+http://localhost:5000
+http://10.123.177.240:5000
 ```
 
 ## Expected Outcome

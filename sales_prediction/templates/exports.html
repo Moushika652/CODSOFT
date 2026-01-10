@@ -16,15 +16,13 @@
             text-align: center;
             margin-bottom: 30px;
         }
-        .exports-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .exports-header p {
-            color: #666;
-            font-size: 1.1rem;
+        .header-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         .back-btn {
             display: inline-block;
@@ -34,12 +32,33 @@
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            margin-bottom: 20px;
             transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
         }
-        .back-btn:hover {
+        .download-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        .back-btn:hover, .download-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .exports-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .exports-header p {
+            color: #666;
+            font-size: 1.1rem;
         }
         .predictions-table {
             width: 100%;
@@ -93,12 +112,16 @@
     <div class="container">
         <div class="exports-container">
             <div class="exports-header">
-                <a href="/" class="back-btn">← Back to Predictions</a>
+                <div class="header-buttons">
+                    <a href="/" class="back-btn">← Back to Predictions</a>
+                    {% if count > 0 %}
+                    <a href="/download-predictions" class="download-btn">📥 Download CSV</a>
+                    {% endif %}
+                </div>
                 <h1>📊 All Sales Predictions</h1>
                 <p>Complete history of all predictions made</p>
                 {% if count > 0 %}
                 <div class="count-badge">Total Predictions: {{ count }}</div>
-                <a href="/download-predictions" class="back-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-left: 10px;">📥 Download CSV</a>
                 {% endif %}
             </div>
 

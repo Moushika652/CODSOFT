@@ -120,11 +120,9 @@ function displayResults(data) {
     
     featuresUsed.appendChild(featuresList);
     
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.marginTop = '20px';
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.gap = '15px';
-    buttonContainer.style.flexDirection = 'column';
+    const viewBtnContainer = document.createElement('div');
+    viewBtnContainer.style.marginTop = '25px';
+    viewBtnContainer.style.textAlign = 'center';
     
     const viewBtn = document.createElement('button');
     viewBtn.className = 'export-btn';
@@ -133,17 +131,8 @@ function displayResults(data) {
         window.open('/exports', '_blank');
     };
     
-    const downloadBtn = document.createElement('button');
-    downloadBtn.className = 'export-btn';
-    downloadBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-    downloadBtn.innerHTML = '<span class="btn-text">📥 Download Predictions (CSV)</span>';
-    downloadBtn.onclick = () => {
-        window.location.href = '/download-predictions';
-    };
-    
-    buttonContainer.appendChild(viewBtn);
-    buttonContainer.appendChild(downloadBtn);
-    featuresUsed.appendChild(buttonContainer);
+    viewBtnContainer.appendChild(viewBtn);
+    featuresUsed.appendChild(viewBtnContainer);
     
     resultCard.style.display = 'block';
     
@@ -183,3 +172,7 @@ inputs.forEach(input => {
         }
     });
 });
+
+function downloadPredictions() {
+    window.location.href = '/download-predictions';
+}

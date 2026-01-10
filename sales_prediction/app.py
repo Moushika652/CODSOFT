@@ -13,11 +13,55 @@ model_loaded = False
 feature_columns = None
 data_df = None
 predictions_history = []
+PREDICTIONS_FILE = 'data/sales_predictions_history.csv'
+
+def load_predictions_history():
+    global predictions_history
+    if os.path.exists(PREDICTIONS_FILE):
+        try:
+            df = pd.read_csv(PREDICTIONS_FILE)
+            predictions_history = df.to_dict('records')
+            print(f"Loaded {len(predictions_history)} previous predictions from {PREDICTIONS_FILE}")
+            return True
+        except Exception as e:
+            print(f"Error loading predictions history: {e}")
+            predictions_history = []
+            return False
+    else:
+        print("No previous predictions found. Starting fresh.")
+        predictions_history = []
+        return True
+
+def save_predictions_history():
+    global predictions_history, feature_columns
+    try:
+        os.makedirs('data', exist_ok=True)
+        if predictions_history:
+            df = pd.DataFrame(predictions_history)
+            df.to_csv(PREDICTIONS_FILE, index=False)
+            print(f"Saved {len(predictions_history)} predictions to {PREDICTIONS_FILE}")
+        else:
+            if feature_columns:
+                columns = feature_columns.copy()
+                columns.append('Predicted_Sales')
+                df = pd.DataFrame(columns=columns)
+                df.to_csv(PREDICTIONS_FILE, index=False)
+            else:
+                df = pd.DataFrame(columns=['TV', 'Radio', 'Newspaper', 'Predicted_Sales'])
+                df.to_csv(PREDICTIONS_FILE, index=False)
+        return True
+    except Exception as e:
+        print(f"Error saving predictions history: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 def initialize_model():
     global model, model_loaded, feature_columns, data_df
     
     model_path = 'models/sales_model.pkl'
+    
+    load_predictions_history()
     
     if os.path.exists('data/advertising.csv'):
         data_path = 'data/advertising.csv'
@@ -107,10 +151,13 @@ def predict():
         prediction_record['Predicted_Sales'] = float(prediction)
         predictions_history.append(prediction_record)
         
+        save_predictions_history()
+        
         return jsonify({
             'success': True,
             'prediction': float(prediction),
-            'features': input_features
+            'features': input_features,
+            'currency_symbol': '₹'
         })
         
     except Exception as e:
@@ -149,11 +196,19 @@ def model_info():
 @app.route('/download-predictions', methods=['GET'])
 def download_predictions():
     global predictions_history
-    if not predictions_history:
-        return jsonify({'error': 'No predictions to download'}), 404
-    
     try:
-        df = pd.DataFrame(predictions_history)
+        load_predictions_history()
+        
+        if not predictions_history:
+            if feature_columns:
+                columns = feature_columns.copy()
+                columns.append('Predicted_Sales')
+                df = pd.DataFrame(columns=columns)
+            else:
+                df = pd.DataFrame(columns=['TV', 'Radio', 'Newspaper', 'Predicted_Sales'])
+        else:
+            df = pd.DataFrame(predictions_history)
+        
         csv_string = df.to_csv(index=False)
         
         from flask import Response
@@ -168,14 +223,18 @@ def download_predictions():
 @app.route('/exports')
 def view_exports():
     global predictions_history
-    return render_template('exports.html', predictions=predictions_history, count=len(predictions_history))
+    load_predictions_history()
+    return render_template('exports.html', predictions=predictions_history, count=len(predictions_history), currency_symbol='₹')
 
 if __name__ == '__main__':
     print("Initializing Sales Prediction App...")
     if initialize_model():
         print("Model loaded successfully!")
         print("Starting Flask server...")
-        print("Open your browser and go to: http://127.0.0.1:5000")
+        print("Server running on:")
+        print("  - http://localhost:5000")
+        print("  - http://0.0.0.0:5000")
+        print("  - http://10.123.177.240:5000 (if accessible from network)")
         app.run(debug=True, host='0.0.0.0', port=5000)
     else:
         print("Failed to initialize model. Please check your dataset.")

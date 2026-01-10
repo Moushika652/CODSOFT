@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Prediction System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -13,6 +13,7 @@
             <div class="shape shape-1"></div>
             <div class="shape shape-2"></div>
             <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
         </div>
 
         <div class="main-content">
@@ -63,18 +64,18 @@
             <div class="info-grid">
                 <div class="info-card">
                     <div class="info-icon">📈</div>
-                    <h3>Data-Driven</h3>
-                    <p>Predictions based on historical sales data analysis</p>
+                    <h3>Data-Driven Insights</h3>
+                    <p>Advanced analytics powered by historical sales patterns and market trends</p>
                 </div>
                 <div class="info-card">
                     <div class="info-icon">🎯</div>
                     <h3>Accurate Forecasts</h3>
-                    <p>Machine learning model trained on real business data</p>
+                    <p>Machine learning algorithms trained on comprehensive business datasets</p>
                 </div>
                 <div class="info-card">
                     <div class="info-icon">⚡</div>
-                    <h3>Quick Results</h3>
-                    <p>Get instant sales predictions for better planning</p>
+                    <h3>Real-Time Predictions</h3>
+                    <p>Instant sales forecasts to support strategic decision-making</p>
                 </div>
             </div>
 
@@ -83,6 +84,11 @@
             </footer>
         </div>
     </div>
+
+    <button class="download-fab" id="downloadFab" onclick="downloadPredictions()" title="Download Predictions">
+        <span class="fab-icon">📥</span>
+        <span class="fab-text">Download</span>
+    </button>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

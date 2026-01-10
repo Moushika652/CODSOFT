@@ -1123,7 +1123,7 @@ body {
     .fab-text {
         font-size: 10px;
     }
-}
+
 
 @media (max-width: 480px) {
     .header h1 {
@@ -1174,7 +1174,7 @@ body {
         bottom: 20px;
         right: 20px;
     }
-}
+
 
 /* Toast Notifications */
 .toast {

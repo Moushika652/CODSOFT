@@ -25,13 +25,38 @@
                     <h1>Iris Flower Classification</h1>
                 </div>
                 <p class="subtitle">Predict the species of an Iris flower using Machine Learning</p>
+                
+                <!-- Navigation Tabs -->
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchTab('predict', this)">
+                        <span class="tab-icon">🔮</span>
+                        Predict
+                    </button>
+                    <button class="nav-tab" onclick="switchTab('learn', this)">
+                        <span class="tab-icon">📚</span>
+                        Learn
+                    </button>
+                    <button class="nav-tab" onclick="switchTab('quiz', this)">
+                        <span class="tab-icon">🎯</span>
+                        Quiz
+                    </button>
+                    <button class="nav-tab" onclick="switchTab('game', this)">
+                        <span class="tab-icon">🎮</span>
+                        Game
+                    </button>
+                </div>
             </header>
 
-            <div class="card prediction-card">
-                <div class="card-header">
-                    <h2>Enter Flower Measurements</h2>
-                    <p>Provide the measurements in centimeters (cm)</p>
-                </div>
+            <!-- Tab Content Container -->
+            <div class="tab-content">
+                
+                <!-- Predict Tab -->
+                <div id="predict-tab" class="tab-pane active">
+                    <div class="card prediction-card">
+                        <div class="card-header">
+                            <h2>Enter Flower Measurements</h2>
+                            <p>Provide the measurements in centimeters (cm)</p>
+                        </div>
 
                 <form id="predictionForm" class="prediction-form">
                     <div class="form-grid">
@@ -144,6 +169,276 @@
 
                 <button class="reset-btn" onclick="resetForm()">Classify Another Flower</button>
             </div>
+                </div>
+                
+                <!-- Learn Tab -->
+                <div id="learn-tab" class="tab-pane">
+                    <div class="card learn-card">
+                        <div class="card-header">
+                            <h2>📚 Learn About Iris Flowers</h2>
+                            <p>Discover the fascinating world of Iris species</p>
+                        </div>
+                        
+                        <div class="learn-content">
+                            <div class="species-details">
+                                <div class="species-detail-card">
+                                    <div class="species-header">
+                                        <div class="species-icon-large">🌿</div>
+                                        <h3>Iris Setosa</h3>
+                                    </div>
+                                    <div class="species-info">
+                                        <div class="info-row">
+                                            <span class="info-label">📏 Sepal Length:</span>
+                                            <span class="info-value">4.3 - 5.8 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">📏 Sepal Width:</span>
+                                            <span class="info-value">2.3 - 4.4 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">🌺 Petal Length:</span>
+                                            <span class="info-value">1.0 - 1.9 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">🌺 Petal Width:</span>
+                                            <span class="info-value">0.1 - 0.6 cm</span>
+                                        </div>
+                                        <div class="species-description">
+                                            <p><strong>Characteristics:</strong> Smallest petals, easily distinguishable from other species. Often found in coastal regions of Alaska and Canada.</p>
+                                            <p><strong>Fun Fact:</strong> Setosa means "bristly" in Latin, referring to the beard-like structures on the flower.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="species-detail-card">
+                                    <div class="species-header">
+                                        <div class="species-icon-large">🌷</div>
+                                        <h3>Iris Versicolor</h3>
+                                    </div>
+                                    <div class="species-info">
+                                        <div class="info-row">
+                                            <span class="info-label">📏 Sepal Length:</span>
+                                            <span class="info-value">4.9 - 7.0 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">📏 Sepal Width:</span>
+                                            <span class="info-value">2.0 - 3.4 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">🌺 Petal Length:</span>
+                                            <span class="info-value">3.0 - 5.1 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">🌺 Petal Width:</span>
+                                            <span class="info-value">1.0 - 1.8 cm</span>
+                                        </div>
+                                        <div class="species-description">
+                                            <p><strong>Characteristics:</strong> Medium-sized flowers, often with purple-blue petals. Native to eastern North America.</p>
+                                            <p><strong>Fun Fact:</strong> Versicolor means "variously colored" - these flowers come in many shades of blue and purple.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="species-detail-card">
+                                    <div class="species-header">
+                                        <div class="species-icon-large">🌹</div>
+                                        <h3>Iris Virginica</h3>
+                                    </div>
+                                    <div class="species-info">
+                                        <div class="info-row">
+                                            <span class="info-label">📏 Sepal Length:</span>
+                                            <span class="info-value">4.9 - 7.9 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">📏 Sepal Width:</span>
+                                            <span class="info-value">2.2 - 3.8 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">🌺 Petal Length:</span>
+                                            <span class="info-value">4.5 - 6.9 cm</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">🌺 Petal Width:</span>
+                                            <span class="info-value">1.4 - 2.5 cm</span>
+                                        </div>
+                                        <div class="species-description">
+                                            <p><strong>Characteristics:</strong> Largest petals among the three species, often with deep blue or violet flowers.</p>
+                                            <p><strong>Fun Fact:</strong> Virginica means "of Virginia" - these flowers are common in the eastern United States, including Virginia.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="measurement-guide">
+                                <h3>🔍 How to Measure Iris Flowers</h3>
+                                <div class="guide-steps">
+                                    <div class="step">
+                                        <div class="step-number">1</div>
+                                        <div class="step-content">
+                                            <h4>Sepal Length</h4>
+                                            <p>Measure from the base to the tip of the sepal (the outer petal-like part)</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <div class="step-content">
+                                            <h4>Sepal Width</h4>
+                                            <p>Measure the widest part of the sepal</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <div class="step-content">
+                                            <h4>Petal Length</h4>
+                                            <p>Measure from the base to the tip of the inner petal</p>
+                                        </div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">4</div>
+                                        <div class="step-content">
+                                            <h4>Petal Width</h4>
+                                            <p>Measure the widest part of the inner petal</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quiz Tab -->
+                <div id="quiz-tab" class="tab-pane">
+                    <div class="card quiz-card">
+                        <div class="card-header">
+                            <h2>🎯 Test Your Knowledge</h2>
+                            <p>Challenge yourself with Iris flower questions!</p>
+                        </div>
+                        
+                        <div class="quiz-content">
+                            <div class="quiz-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Score:</span>
+                                    <span class="stat-value" id="quizScore">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Question:</span>
+                                    <span class="stat-value" id="questionNumber">1/10</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Streak:</span>
+                                    <span class="stat-value" id="streakCount">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-container" id="quizContainer">
+                                <div class="quiz-question" id="quizQuestion">
+                                    <h3 id="questionText">Loading question...</h3>
+                                </div>
+                                
+                                <div class="quiz-options" id="quizOptions">
+                                    <!-- Options will be populated here -->
+                                </div>
+                                
+                                <div class="quiz-feedback" id="quizFeedback">
+                                    <!-- Feedback will be shown here -->
+                                </div>
+                                
+                                <div class="quiz-controls">
+                                    <button class="quiz-btn" id="nextBtn" onclick="nextQuestion()" style="display: none;">
+                                        Next Question →
+                                    </button>
+                                    <button class="quiz-btn" id="startQuizBtn" onclick="startQuiz()">
+                                        Start Quiz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Tab -->
+                <div id="game-tab" class="tab-pane">
+                    <div class="card game-card">
+                        <div class="card-header">
+                            <h2>🎮 Guess the Species Game</h2>
+                            <p>Can you identify the Iris species from measurements?</p>
+                        </div>
+                        
+                        <div class="game-content">
+                            <div class="game-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Score:</span>
+                                    <span class="stat-value" id="gameScore">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Round:</span>
+                                    <span class="stat-value" id="gameRound">1/10</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Accuracy:</span>
+                                    <span class="stat-value" id="gameAccuracy">0%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="game-container" id="gameContainer">
+                                <div class="game-measurements" id="gameMeasurements">
+                                    <h3>Flower Measurements</h3>
+                                    <div class="measurement-display">
+                                        <div class="measurement-item">
+                                            <span class="measurement-label">Sepal Length:</span>
+                                            <span class="measurement-value" id="gameSepalLength">-</span>
+                                        </div>
+                                        <div class="measurement-item">
+                                            <span class="measurement-label">Sepal Width:</span>
+                                            <span class="measurement-value" id="gameSepalWidth">-</span>
+                                        </div>
+                                        <div class="measurement-item">
+                                            <span class="measurement-label">Petal Length:</span>
+                                            <span class="measurement-value" id="gamePetalLength">-</span>
+                                        </div>
+                                        <div class="measurement-item">
+                                            <span class="measurement-label">Petal Width:</span>
+                                            <span class="measurement-value" id="gamePetalWidth">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="game-options" id="gameOptions">
+                                    <h3>Choose the Species:</h3>
+                                    <div class="species-options">
+                                        <button class="species-option" onclick="makeGuess('setosa')">
+                                            <span class="option-icon">🌿</span>
+                                            <span class="option-name">Iris Setosa</span>
+                                        </button>
+                                        <button class="species-option" onclick="makeGuess('versicolor')">
+                                            <span class="option-icon">🌷</span>
+                                            <span class="option-name">Iris Versicolor</span>
+                                        </button>
+                                        <button class="species-option" onclick="makeGuess('virginica')">
+                                            <span class="option-icon">🌹</span>
+                                            <span class="option-name">Iris Virginica</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="game-feedback" id="gameFeedback">
+                                    <!-- Feedback will be shown here -->
+                                </div>
+                                
+                                <div class="game-controls">
+                                    <button class="game-btn" id="nextRoundBtn" onclick="nextRound()" style="display: none;">
+                                        Next Round →
+                                    </button>
+                                    <button class="game-btn" id="startGameBtn" onclick="startGame()">
+                                        Start Game
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div> <!-- End Tab Content Container -->
 
             <div class="info-grid">
                 <div class="info-card">

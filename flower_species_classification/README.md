@@ -72,15 +72,6 @@ The model uses four numerical features:
 
 3. **Enter flower measurements** in the form and click "Classify Flower" to get predictions!
 
-## 📝 Usage
-
-1. Enter the four measurements (Sepal Length, Sepal Width, Petal Length, Petal Width) in centimeters
-2. Click the "Classify Flower" button
-3. View the predicted species along with:
-   - Confidence percentage
-   - Probability distribution for all three species
-4. Click "Classify Another Flower" to make more predictions
-
 ## 🎨 Design Features
 
 - Gradient backgrounds with animated color shifts
@@ -159,7 +150,5 @@ Created as part of the CODSOFT machine learning project collection.
 - Flask for the web framework
 - The Iris dataset (Fisher's Iris dataset)
 
----
-
-**Enjoy classifying Iris flowers! 🌸**
-
+# Conclusion
+This project demonstrates the practical application of machine learning in a real-world scenario. By combining data science with web development, we've created an interactive tool that can classify flower species with high accuracy. The project serves as an excellent example of how to build end-to-end ML applications that are both functional and user-friendly.

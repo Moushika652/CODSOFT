@@ -85,17 +85,6 @@ fraud_detection_in_credit_card/
 └── README.md                 # This file
 ```
 
-## 🎨 Customization
-
-### Changing Colors
-
-Edit the CSS variables in `templates/index_simple.html`:
-
-```css
-body {
-    background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #f9a8d4 100%);
-}
-```
 
 ### Adjusting Risk Thresholds
 
@@ -154,14 +143,5 @@ This project is open source and available under the MIT License.
 - **Flask** for the web framework
 - **Glass morphism design** inspiration from modern UI trends
 
----
-
-**Made with ❤️ for secure financial transactions**
-
-## 📞 Support
-
-For any questions or issues, please open an issue in the repository or contact the development team.
-
----
-
-*Last updated: January 2026*
+# Conclusion 
+This project demonstrates the practical application of Python and machine learning in solving real-world financial problems. By analyzing transaction patterns and building predictive models, businesses can proactively detect fraudulent activities and protect their customers' financial data. The integration of web development technologies makes this solution accessible and user-friendly for financial institutions and businesses of all sizes.

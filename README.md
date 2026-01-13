@@ -12,3 +12,7 @@ The project is the practical application of machine learning in a real-world sce
 
 # FLOWER_SPECIES_CLASSIFICATION
 This project does the practical application of machine learning in a real-world scenario. By combining data science with web development, we've created an interactive tool that can classify flower species with high accuracy. The project serves as an excellent example of how to build end-to-end ML applications that are both functional and user-friendly.
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8b73ae3a0441af930ce20f9186b44647a8394280

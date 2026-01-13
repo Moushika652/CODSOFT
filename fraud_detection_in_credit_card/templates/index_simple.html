@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Fraud Detection | Simple Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #f9a8d4 100%);
+            min-height: 100vh;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-dark {
+            background: rgba(236, 72, 153, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .risk-indicator {
+            transition: all 0.3s ease;
+        }
+        .text-dark {
+            color: #831843;
+        }
+        .text-gray-dark {
+            color: #9f1239;
+        }
+        .pink-gradient {
+            background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="glass-dark rounded-2xl p-8 mb-6">
+                <i class="fas fa-credit-card text-6xl text-white mb-4"></i>
+                <h1 class="text-4xl font-bold text-white mb-2">Credit Card Fraud Detection</h1>
+                <p class="text-white text-lg">Simple Transaction Fraud Predictor</p>
+            </div>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="glass-effect rounded-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold text-dark mb-6 text-center">
+                <i class="fas fa-info-circle mr-2"></i>Overview
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <h3 class="font-bold text-dark mb-3">
+                        <i class="fas fa-shield-alt text-blue-600 mr-2"></i>What is Credit Card Fraud?
+                    </h3>
+                    <p class="text-gray-dark">
+                        Credit card fraud occurs when someone uses your credit card information without your permission to make purchases or withdraw money. This can happen through stolen cards, data breaches, or identity theft.
+                    </p>
+                </div>
+                
+                <div class="bg-green-50 rounded-lg p-6">
+                    <h3 class="font-bold text-dark mb-3">
+                        <i class="fas fa-brain text-green-600 mr-2"></i>How Our System Works
+                    </h3>
+                    <p class="text-gray-dark">
+                        Our fraud detection system uses machine learning algorithms to analyze transaction patterns and identify suspicious activities. It considers factors like transaction amount, time, location, and transaction type to calculate a risk score.
+                    </p>
+                </div>
+                
+                <div class="bg-yellow-50 rounded-lg p-6">
+                    <h3 class="font-bold text-dark mb-3">
+                        <i class="fas fa-chart-line text-yellow-600 mr-2"></i>Key Risk Factors
+                    </h3>
+                    <ul class="text-gray-dark space-y-2">
+                        <li>• High transaction amounts (over ₹5,000)</li>
+                        <li>• Unusual transaction times (before 6 AM or after 10 PM)</li>
+                        <li>• International or online transactions</li>
+                        <li>• Multiple transactions in short time periods</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-purple-50 rounded-lg p-6">
+                    <h3 class="font-bold text-dark mb-3">
+                        <i class="fas fa-check-circle text-purple-600 mr-2"></i>How to Use
+                    </h3>
+                    <ol class="text-gray-dark space-y-2">
+                        <li>1. Enter transaction details in the form below</li>
+                        <li>2. Click "Detect Fraud" to analyze the transaction</li>
+                        <li>3. Review the risk assessment and recommendations</li>
+                        <li>4. Take appropriate action based on the results</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Form -->
+        <div class="glass-effect rounded-2xl p-8">
+            <h2 class="text-2xl font-bold text-dark mb-6 text-center">Enter Transaction Details</h2>
+            
+            <form id="fraudForm" class="space-y-6">
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Amount -->
+                    <div>
+                        <label class="block text-dark font-semibold mb-2">
+                            <i class="fas fa-rupee-sign mr-2"></i>Transaction Amount (₹)
+                        </label>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0" max="15000" required
+                               class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                               placeholder="e.g., 125.50">
+                    </div>
+                    
+                    <!-- Time -->
+                    <div>
+                        <label class="block text-dark font-semibold mb-2">
+                            <i class="fas fa-clock mr-2"></i>Time (24-hour)
+                        </label>
+                        <input type="number" id="time" name="time" min="0" max="23" required
+                               class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                               placeholder="e.g., 14 (2 PM)">
+                    </div>
+                    
+                    <!-- Transaction Type -->
+                    <div>
+                        <label class="block text-dark font-semibold mb-2">
+                            <i class="fas fa-shopping-cart mr-2"></i>Transaction Type
+                        </label>
+                        <select id="transactionType" name="transactionType" required
+                                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent">
+                            <option value="">Select Type</option>
+                            <option value="purchase">Purchase</option>
+                            <option value="transfer">Transfer</option>
+                            <option value="withdrawal">Withdrawal</option>
+                            <option value="online">Online Payment</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Location -->
+                    <div class="md:col-span-3">
+                        <label class="block text-dark font-semibold mb-2">
+                            <i class="fas fa-map-marker-alt mr-2"></i>Location
+                        </label>
+                        <select id="location" name="location" required
+                                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent">
+                            <option value="">Select Location</option>
+                            <option value="local">Local (Same City)</option>
+                            <option value="domestic">Domestic (Different City)</option>
+                            <option value="international">International</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="pink-gradient text-white px-8 py-4 rounded-lg font-bold hover:bg-pink-600 transition transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-shield-alt mr-2"></i>Detect Fraud
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Results Section -->
+            <div id="results" class="hidden mt-8">
+                <div class="glass-effect rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-dark mb-4 text-center">Prediction Results</h3>
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple fraud detection logic
+        function calculateFraudRisk(amount, time, type, location) {
+            let riskScore = 0;
+            
+            // Amount-based risk (adjusted for Indian rupee amounts)
+            if (amount > 5000) riskScore += 30;
+            else if (amount > 2500) riskScore += 20;
+            else if (amount > 500) riskScore += 10;
+            
+            // Time-based risk
+            if (time < 6 || time > 22) riskScore += 25;
+            else if (time < 9 || time > 18) riskScore += 15;
+            
+            // Transaction type risk
+            if (type === 'online') riskScore += 20;
+            else if (type === 'transfer') riskScore += 15;
+            else if (type === 'withdrawal') riskScore += 10;
+            
+            // Location-based risk
+            if (location === 'international') riskScore += 30;
+            else if (location === 'online') riskScore += 20;
+            else if (location === 'domestic') riskScore += 10;
+            
+            return Math.min(riskScore, 100);
+        }
+
+        // Handle form submission
+        document.getElementById('fraudForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const amount = parseFloat(document.getElementById('amount').value);
+            const time = parseInt(document.getElementById('time').value);
+            const type = document.getElementById('transactionType').value;
+            const location = document.getElementById('location').value;
+            
+            // Calculate risk
+            const riskScore = calculateFraudRisk(amount, time, type, location);
+            const isFraud = riskScore > 70;
+            
+            // Display results
+            const resultsDiv = document.getElementById('results');
+            const resultContent = document.getElementById('resultContent');
+            
+            const statusColor = isFraud ? 'red' : 'green';
+            const statusIcon = isFraud ? 'exclamation-triangle' : 'check-circle';
+            const statusText = isFraud ? 'FRAUD DETECTED' : 'TRANSACTION SAFE';
+            const riskLevel = riskScore > 70 ? 'HIGH' : riskScore > 40 ? 'MEDIUM' : 'LOW';
+            
+            resultContent.innerHTML = `
+                <div class="text-center">
+                    <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-${statusColor}-500 mb-4">
+                        <i class="fas fa-${statusIcon} text-white text-4xl"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-dark mb-2">${statusText}</h4>
+                    <p class="text-gray-dark text-lg mb-4">Risk Level: <span class="font-bold">${riskLevel}</span></p>
+                    
+                    <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-dark">Risk Score:</span>
+                            <span class="text-dark font-bold">${riskScore}%</span>
+                        </div>
+                        <div class="w-full bg-gray-300 rounded-full h-4">
+                            <div class="bg-${statusColor}-500 h-4 rounded-full risk-indicator" style="width: ${riskScore}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-gray-dark text-sm">
+                        <p class="mb-2"><strong>Transaction Details:</strong></p>
+                        <p>Amount: ₹${amount.toFixed(2)}</p>
+                        <p>Time: ${time}:00 ${time < 12 ? 'AM' : 'PM'}</p>
+                        <p>Type: ${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                        <p>Location: ${location.charAt(0).toUpperCase() + location.slice(1)}</p>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-6">
+                    <button onclick="resetForm()" class="pink-gradient text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition">
+                        <i class="fas fa-redo mr-2"></i>Check Another Transaction
+                    </button>
+                </div>
+            `;
+            
+            resultsDiv.classList.remove('hidden');
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('fraudForm').reset();
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('fraudForm').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

@@ -13,7 +13,7 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     """Serve the simple fraud detection page"""
-    return render_template('index_simple.html')
+    return render_template('index.html')
 
 @app.route('/health')
 def health():
